@@ -132,6 +132,27 @@ export type CoreAction =
       users: string[];
       repoMode: "create" | "existing"; // create new repo OR use existing
       repoName?: string; // required if repoMode="existing"
+    }
+  // ─── LOGAN Vercel tools (Task 32) ──────────────────────────────────────────
+  | {
+      // vercel_check_status — read-only. Returns the *.vercel.app URL + last deploy state.
+      type: "vercel_check_status";
+      projectName: string;
+    }
+  | {
+      // vercel_create_project — creates a Vercel project linked to an allowed repo.
+      type: "vercel_create_project";
+      projectName: string; // lowercase, hyphens, 3-40 chars
+      repo: string;         // MUST be in LOGAN_ALLOWED_REPOS
+      rootDirectory?: string;
+    }
+  | {
+      // vercel_deploy — triggers a deploy. target="production" requires production:true
+      // AND branch="main" (Art. IX — the user must explicitly ask for production).
+      type: "vercel_deploy";
+      projectName: string;
+      branch?: string;       // default "main"
+      production?: boolean;  // explicit opt-in for production target
     };
 
 /** Constitutional self-check that Core includes in its response. */
@@ -247,6 +268,41 @@ export type ActionTaken =
       files?: { path: string; commitSha: string; created: boolean }[];
       status: string;    // "creado" | "fallido"
       error?: string;    // present if status="fallido"
+    }
+  // ─── LOGAN Vercel tools — ActionTaken variants (Task 32) ──────────────────
+  | {
+      type: "vercel_check_status";
+      projectName: string;
+      exists: boolean;
+      url?: string;
+      productionDomain?: string | null;
+      lastDeploy?: {
+        state: string;
+        createdAt: string;
+        url: string;
+        target?: string;
+      } | null;
+      vercelActionId: string;
+      status: string; // "creado" | "fallido"
+    }
+  | {
+      type: "vercel_create_project";
+      projectName: string;
+      projectId?: string; // the Vercel project ID on success
+      url?: string;
+      repo: string;
+      vercelActionId: string;
+      status: string;
+    }
+  | {
+      type: "vercel_deploy";
+      projectName: string;
+      deploymentId?: string;
+      deployUrl?: string;
+      inspectorUrl?: string;
+      target?: string;
+      vercelActionId: string;
+      status: string;
     };
 
 /** The full payload returned by the POST /api/core endpoint. */

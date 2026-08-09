@@ -40,6 +40,7 @@ import {
   executeScaffoldDelegations,
 } from "@/lib/core/execute-actions";
 import { executeGitActions } from "@/lib/git/execute-git-actions";
+import { executeVercelActions } from "@/lib/vercel/execute-vercel-actions";
 import type {
   ActionTaken, ConstitutionalCheck, CoreEndpointResult,
   MarketingDeliverable, DevDeliverable, DesignDeliverable, AnalyticsDeliverable,
@@ -102,6 +103,9 @@ function buildDocumentsUpdated(actionsTaken: ActionTaken[]): { doc: string; chan
       }
       return [{ doc: "Scaffold", change: `Falló scaffold de "${a.productName}" — ${a.error || "error desconocido"}` }];
     }
+    if (a.type === "vercel_check_status") return [{ doc: "VercelAction", change: `Status ${a.projectName} — ${a.status}${a.url ? ` (${a.url})` : ""}` }];
+    if (a.type === "vercel_create_project") return [{ doc: "VercelAction", change: `Project ${a.projectName}${a.url ? ` (${a.url})` : ""} — ${a.status}` }];
+    if (a.type === "vercel_deploy") return [{ doc: "VercelAction", change: `Deploy ${a.projectName}${a.deployUrl ? ` → ${a.deployUrl}` : ""} — ${a.status}${a.target ? ` [${a.target}]` : ""}` }];
     return [];
   });
 }
@@ -152,6 +156,7 @@ function delegationLabelsFor(actions: { type: string }[]): string[] {
   if (actions.some((a) => a.type === "support_execute")) labels.push("Support");
   if (actions.some((a) => a.type.startsWith("git_"))) labels.push("GitHub");
   if (actions.some((a) => a.type === "scaffold_project")) labels.push("Scaffold");
+  if (actions.some((a) => a.type.startsWith("vercel_"))) labels.push("Vercel");
   return labels;
 }
 
@@ -241,9 +246,10 @@ export async function runCoreTurn(
   let supportActionsTaken: ActionTaken[] = [], supportDeliverables: SupportDeliverable[] = [];
   let gitActionsTaken: ActionTaken[] = [];
   let scaffoldActionsTaken: ActionTaken[] = [];
+  let vercelActionsTaken: ActionTaken[] = [];
 
   try {
-    const [draftAndActions, mkt, dev, des, ana, fin, leg, sup, git, sca] = await Promise.all([
+    const [draftAndActions, mkt, dev, des, ana, fin, leg, sup, git, sca, ver] = await Promise.all([
       // Branch 1: draft validator → executeActions (sequential within branch).
       (async () => {
         let draft: ConstitutionalCheck | null = null;
@@ -264,6 +270,7 @@ export async function runCoreTurn(
       executeSupportDelegations(projectId, parsed.actions),
       executeGitActions(projectId, parsed.actions),
       executeScaffoldDelegations(parsed.actions),
+      executeVercelActions(projectId, parsed.actions),
     ]);
     draftConstitutional = draftAndActions.draft;
     nonSpecialistActions = draftAndActions.actions;
@@ -276,9 +283,10 @@ export async function runCoreTurn(
     supportActionsTaken = sup.actionsTaken; supportDeliverables = sup.deliverables;
     gitActionsTaken = git;
     scaffoldActionsTaken = sca;
+    vercelActionsTaken = ver;
   } catch (e) { console.error("[core] Delegations:", (e as Error).message); }
 
-  const actionsTaken: ActionTaken[] = [...nonSpecialistActions, ...marketingActionsTaken, ...devActionsTaken, ...designActionsTaken, ...analyticsActionsTaken, ...financeActionsTaken, ...legalActionsTaken, ...supportActionsTaken, ...gitActionsTaken, ...scaffoldActionsTaken];
+  const actionsTaken: ActionTaken[] = [...nonSpecialistActions, ...marketingActionsTaken, ...devActionsTaken, ...designActionsTaken, ...analyticsActionsTaken, ...financeActionsTaken, ...legalActionsTaken, ...supportActionsTaken, ...gitActionsTaken, ...scaffoldActionsTaken, ...vercelActionsTaken];
 
   const allDeliverables = [...marketingDeliverables, ...devDeliverables, ...designDeliverables, ...analyticsDeliverables, ...financeDeliverables, ...legalDeliverables, ...supportDeliverables];
   let finalResponse = parsed.response;

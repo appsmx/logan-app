@@ -61,3 +61,5 @@ db/
 
 # Local agent-ctx scratch
 agent-ctx/
+tool-results/
+test-vercel-tools.ts

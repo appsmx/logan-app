@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client'
 // preserves `globalThis` across hot reloads, so without a version bump the old
 // instance (missing new model accessors like `legalAsset` / `supportAsset`)
 // would persist indefinitely.
-const SCHEMA_VERSION = 'v10_git_tools_a'
+const SCHEMA_VERSION = 'v11_vercel_tools'
 
 const KEY = `prisma_${SCHEMA_VERSION}`
 

@@ -216,6 +216,25 @@ function asActions(value: unknown): CoreAction[] {
         repoMode,
         ...(repoMode === "existing" && typeof a.repoName === "string" && a.repoName.length > 0 ? { repoName: a.repoName } : {}),
       });
+    } else if (type === "vercel_check_status") {
+      out.push({
+        type: "vercel_check_status",
+        projectName: asString(a.projectName, ""),
+      });
+    } else if (type === "vercel_create_project") {
+      out.push({
+        type: "vercel_create_project",
+        projectName: asString(a.projectName, ""),
+        repo: asString(a.repo, ""),
+        ...(typeof a.rootDirectory === "string" && a.rootDirectory.length > 0 ? { rootDirectory: a.rootDirectory } : {}),
+      });
+    } else if (type === "vercel_deploy") {
+      out.push({
+        type: "vercel_deploy",
+        projectName: asString(a.projectName, ""),
+        ...(typeof a.branch === "string" && a.branch.length > 0 ? { branch: a.branch } : {}),
+        ...(typeof a.production === "boolean" ? { production: a.production } : {}),
+      });
     }
     // Unknown action types are silently dropped (Art. III — simplicity).
   }
