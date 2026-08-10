@@ -42,7 +42,7 @@
 //   - DEC-LOGAN-011: template lives in templates/. This is the reference impl.
 
 import { NextRequest, NextResponse } from "next/server";
-import ZAI from "z-ai-web-dev-sdk";
+import { callLLM } from "@/lib/llm/client";
 
 import { db } from "@/lib/db";
 import { buildAssistantSystemPrompt, RATE_LIMIT_RESPONSE } from "@/lib/assistant/system-prompt";
@@ -159,12 +159,13 @@ export async function POST(req: NextRequest) {
   // Call Z.ai SDK (server-side only — never imported in client code).
   let responseText: string;
   try {
-    const zai = await ZAI.create();
-    const completion = await zai.chat.completions.create({
-      messages,
-      thinking: { type: "disabled" },
-    });
-    responseText = (completion.choices[0]?.message?.content ?? "").trim();
+    // NOTE: migrated to callLLM — check task mapping
+    // Extract system prompt, history, and user message from the messages array
+    const sysPrompt = messages[0]?.content || systemPrompt;
+    const history = messages.slice(1, -1).map(m => ({ role: m.role === "assistant" ? "assistant" : "user", content: m.content }));
+    const currentMessage = messages[messages.length - 1]?.content || userMessage;
+    const llmResponse = await callLLM({ task: "assistant", systemPrompt: sysPrompt, userMessage: currentMessage, history });
+    responseText = llmResponse.text.trim();
     if (!responseText) {
       console.error("[assistant/chat] LLM devolvió respuesta vacía");
       return unavailable();

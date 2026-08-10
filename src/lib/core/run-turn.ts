@@ -21,7 +21,7 @@
 // parallel block, listing which specialists), "integrating" (before integration
 // call), "done" (result ready).
 
-import ZAI from "z-ai-web-dev-sdk";
+import { callLLM } from "@/lib/llm/client";
 
 import { db } from "@/lib/db";
 import { buildMemoryReport } from "@/lib/core/memory-report";
@@ -215,9 +215,8 @@ export async function runCoreTurn(
   emit({ stage: "thinking", message: "Pensando…" });
   let rawText: string;
   try {
-    const zai = await ZAI.create();
-    const completion = await zai.chat.completions.create({ messages: [{ role: "assistant", content: systemPrompt }, { role: "user", content: message }], thinking: { type: "disabled" } });
-    rawText = completion.choices[0]?.message?.content ?? "";
+    const response = await callLLM({ task: "core_decide", systemPrompt, userMessage: message });
+    rawText = response.text;
     if (!rawText?.trim()) { console.error("[core] LLM vacío"); throw new CoreTurnError("unavailable", "LOGAN Core no disponible en este momento"); }
   } catch (e) {
     if (e instanceof CoreTurnError) throw e;
@@ -295,10 +294,9 @@ export async function runCoreTurn(
   if (allDeliverables.length > 0) {
     emit({ stage: "integrating", message: "Integrando respuesta…" });
     try {
-      const zai = await ZAI.create();
       const integrationPrompt = buildIntegrationUserPrompt(message, marketingDeliverables, devDeliverables, designDeliverables, analyticsDeliverables, financeDeliverables, legalDeliverables, supportDeliverables);
-      const completion = await zai.chat.completions.create({ messages: [{ role: "assistant", content: INTEGRATION_SYSTEM_PROMPT }, { role: "user", content: integrationPrompt }], thinking: { type: "disabled" } });
-      const integrated = completion.choices[0]?.message?.content ?? "";
+      const intResponse = await callLLM({ task: "core_integrate", systemPrompt: INTEGRATION_SYSTEM_PROMPT, userMessage: integrationPrompt });
+      const integrated = intResponse.text;
       if (integrated?.trim()) finalResponse = integrated.trim();
       else console.error("[core] Integration LLM vacío, usando draft");
     } catch (e) {

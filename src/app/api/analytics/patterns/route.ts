@@ -12,7 +12,7 @@
 //   7. Return the full patterns report.
 
 import { NextRequest, NextResponse } from "next/server";
-import ZAI from "z-ai-web-dev-sdk";
+import { callLLM } from "@/lib/llm/client";
 
 import { db } from "@/lib/db";
 import { buildPatternsSystemPrompt } from "@/lib/analytics/system-prompt";
@@ -104,15 +104,9 @@ export async function POST(req: NextRequest) {
   // Call LLM.
   let rawText: string;
   try {
-    const zai = await ZAI.create();
-    const completion = await zai.chat.completions.create({
-      messages: [
-        { role: "assistant", content: systemPrompt },
-        { role: "user", content: `Analiza los patrones de las ${summaries.length} hipótesis del proyecto ${project.name} y genera el reporte completo.` },
-      ],
-      thinking: { type: "disabled" },
-    });
-    rawText = completion.choices[0]?.message?.content ?? "";
+    // NOTE: migrated to callLLM — check task mapping
+    const llmResponse = await callLLM({ task: "analytics", systemPrompt, userMessage: `Analiza los patrones de las ${summaries.length} hipótesis del proyecto ${project.name} y genera el reporte completo.` });
+    rawText = llmResponse.text;
     if (!rawText?.trim()) {
       console.error("[analytics/patterns] LLM vacío");
       return unavailable();

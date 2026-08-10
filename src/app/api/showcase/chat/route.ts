@@ -10,7 +10,7 @@
 //   - DEC-LOGAN-016 (illustrative-not-self-service): NO real work allowed in showcase mode.
 
 import { NextRequest, NextResponse } from "next/server";
-import ZAI from "z-ai-web-dev-sdk";
+import { callLLM } from "@/lib/llm/client";
 
 import { buildShowcaseSystemPrompt } from "@/lib/showcase/system-prompt";
 import { checkRateLimit } from "@/lib/showcase/rate-limit";
@@ -64,15 +64,8 @@ export async function POST(req: NextRequest) {
   const systemPrompt = buildShowcaseSystemPrompt();
 
   try {
-    const zai = await ZAI.create();
-    const completion = await zai.chat.completions.create({
-      messages: [
-        { role: "assistant", content: systemPrompt },
-        { role: "user", content: message },
-      ],
-      thinking: { type: "disabled" },
-    });
-    const response = (completion.choices[0]?.message?.content ?? "").trim();
+    const llmResponse = await callLLM({ task: "showcase", systemPrompt, userMessage: message });
+    const response = llmResponse.text.trim();
     if (!response) {
       return NextResponse.json(
         { error: "LOGAN no respondió. Intenta de nuevo." },

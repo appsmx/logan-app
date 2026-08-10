@@ -13,7 +13,7 @@
 //   8. Return the full verification payload.
 
 import { NextRequest, NextResponse } from "next/server";
-import ZAI from "z-ai-web-dev-sdk";
+import { callLLM } from "@/lib/llm/client";
 
 import { db } from "@/lib/db";
 import { buildVerifySystemPrompt } from "@/lib/analytics/system-prompt";
@@ -86,15 +86,9 @@ export async function POST(req: NextRequest) {
   // Call LLM.
   let rawText: string;
   try {
-    const zai = await ZAI.create();
-    const completion = await zai.chat.completions.create({
-      messages: [
-        { role: "assistant", content: systemPrompt },
-        { role: "user", content: `Verifica la hipótesis con la evidencia proporcionada. Outcome: ${outcome}. Evidencia: ${evidence}.` },
-      ],
-      thinking: { type: "disabled" },
-    });
-    rawText = completion.choices[0]?.message?.content ?? "";
+    // NOTE: migrated to callLLM — check task mapping
+    const llmResponse = await callLLM({ task: "analytics", systemPrompt, userMessage: `Verifica la hipótesis con la evidencia proporcionada. Outcome: ${outcome}. Evidencia: ${evidence}.` });
+    rawText = llmResponse.text;
     if (!rawText?.trim()) {
       console.error("[analytics/verify] LLM vacío");
       return unavailable();

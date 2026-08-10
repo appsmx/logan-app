@@ -1,6 +1,6 @@
 // LOGAN Vercel tools — thin Vercel REST API client.
 //
-// Plain `fetch` (NOT z-ai-web-dev-sdk — Vercel tools are deterministic API
+// Plain `fetch` (NOT LLM provider client — Vercel tools are deterministic API
 // calls, not LLM tasks). The token is a Vercel API token with full project +
 // deploy scope for the team (or personal account).
 //

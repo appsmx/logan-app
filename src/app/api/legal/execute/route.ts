@@ -2,7 +2,7 @@
 // Pattern identical to /api/finance/execute (Art. III).
 
 import { NextRequest, NextResponse } from "next/server";
-import ZAI from "z-ai-web-dev-sdk";
+import { callLLM } from "@/lib/llm/client";
 import { db } from "@/lib/db";
 import { LEGAL_CAPABILITIES } from "@/lib/logan-os-data";
 import { buildLegalSystemPrompt } from "@/lib/legal/system-prompt";
@@ -47,12 +47,9 @@ export async function POST(req: NextRequest) {
 
   let rawText: string;
   try {
-    const zai = await ZAI.create();
-    const completion = await zai.chat.completions.create({
-      messages: [{ role: "assistant", content: systemPrompt }, { role: "user", content: `Brief: ${brief}` }],
-      thinking: { type: "disabled" },
-    });
-    rawText = completion.choices[0]?.message?.content ?? "";
+    // NOTE: migrated to callLLM — check task mapping
+    const llmResponse = await callLLM({ task: "legal", systemPrompt, userMessage: `Brief: ${brief}` });
+    rawText = llmResponse.text;
     if (!rawText?.trim()) { console.error("[legal] LLM vacío"); return unavailable(); }
   } catch (e) { console.error("[legal] Z.ai:", (e as Error).message); return unavailable(); }
 

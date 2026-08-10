@@ -61,7 +61,7 @@ const STACK_REFERENCE = `## Stack de referencia (LOGAN OS)
 - Runtime: Next.js 16 + TypeScript (strict mode)
 - Estilos: Tailwind CSS 4 + shadcn/ui
 - BD: Prisma + SQLite (dev) — import { db } from "@/lib/db"
-- LLM: Z.ai SDK — import ZAI from "z-ai-web-dev-sdk"
+- LLM: Z.ai SDK — import ZAI from "LLM provider client"
 - Deploy: Vercel Pro (DEC-LOGAN-013)
 - Path alias: @/ = app/src/
 - Patrón de referencia para endpoints: /api/marketing/execute/route.ts`;

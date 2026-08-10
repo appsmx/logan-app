@@ -1,6 +1,6 @@
 // LOGAN git tools — thin GitHub REST API client.
 //
-// We use plain `fetch` (NOT z-ai-web-dev-sdk — git tools are deterministic
+// We use plain `fetch` (NOT LLM provider client — git tools are deterministic
 // API calls, not LLM tasks). The token is a Classic PAT with full repo
 // access; the CODE-LEVEL limits enforced in tools.ts are what keep LOGAN
 // inside the Constitution (DEC-LOGAN-014).
