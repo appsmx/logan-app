@@ -9,18 +9,23 @@ import type { LLMConfig, LLMTask, LLMProvider } from "./types";
 // When the user wants to use Gemini for specific tasks (e.g. customer-facing chat
 // where Gemini Flash is cheaper), they edit this map.
 const TASK_MODEL_MAP: Record<LLMTask, { provider: LLMProvider; model: string }> = {
-  core_decide:     { provider: "zai", model: "glm-4.6" },
-  core_integrate:  { provider: "zai", model: "glm-4.6" },
-  validator:       { provider: "zai", model: "glm-4.6" },
-  marketing:       { provider: "zai", model: "glm-4.6" },
-  dev:             { provider: "zai", model: "glm-4.6" },
-  design:          { provider: "zai", model: "glm-4.6" },
-  analytics:       { provider: "zai", model: "glm-4.6" },
-  finance:         { provider: "zai", model: "glm-4.6" },
-  legal:           { provider: "zai", model: "glm-4.6" },
-  support:         { provider: "zai", model: "glm-4.6" },
-  assistant:       { provider: "zai", model: "glm-4.6" },
-  showcase:        { provider: "zai", model: "glm-4.6" },
+  // GLM-5.2 — máxima calidad (donde LOGAN necesita ser tan bueno como Claude Sonnet)
+  core_decide:     { provider: "zai", model: "glm-5.2" },
+  core_integrate:  { provider: "zai", model: "glm-5.2" },
+  dev:             { provider: "zai", model: "glm-5.2" },
+
+  // GLM-5.1 — buena calidad (tareas que necesitan precisión pero no crítica)
+  design:          { provider: "zai", model: "glm-5.1" },
+  analytics:       { provider: "zai", model: "glm-5.1" },
+  legal:           { provider: "zai", model: "glm-5.1" },
+
+  // GLM-5-turbo — rápido y barato (customer-facing + tareas simples)
+  validator:       { provider: "zai", model: "glm-5-turbo" },
+  marketing:       { provider: "zai", model: "glm-5-turbo" },
+  finance:         { provider: "zai", model: "glm-5-turbo" },
+  support:         { provider: "zai", model: "glm-5-turbo" },
+  assistant:       { provider: "zai", model: "glm-5-turbo" },
+  showcase:        { provider: "zai", model: "glm-5-turbo" },
 };
 
 export function getLLMConfig(task: LLMTask): LLMConfig {
