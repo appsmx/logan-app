@@ -19,6 +19,9 @@ export function Header() {
   const setActiveSection = useLoganStore((s) => s.setActiveSection);
   const project = useProject(activeId);
   const [navOpen, setNavOpen] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => setMounted(true), []);
 
   const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
@@ -112,7 +115,9 @@ export function Header() {
             onClick={toggleTheme}
             aria-label="Cambiar tema"
           >
-            {theme === "dark" ? (
+            {!mounted ? (
+              <Sun className="size-5" />
+            ) : theme === "dark" ? (
               <Sun className="size-5" />
             ) : (
               <Moon className="size-5" />
