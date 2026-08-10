@@ -15,7 +15,7 @@
 //
 // Comments in English; user-facing notes in Spanish.
 
-import ZAI from "z-ai-web-dev-sdk";
+import { callLLM } from "@/lib/llm/client";
 
 import { CONSTITUTION_ARTICLES } from "@/lib/logan-os-data";
 import type { ConstitutionalCheck } from "@/lib/core/types";
@@ -94,21 +94,18 @@ export async function validateConstitutional(
   proposedResponse: string,
 ): Promise<ConstitutionalCheck | null> {
   try {
-    const zai = await ZAI.create();
     const userMessage =
       renderArticles() +
       "\n\n---\n\nRespuesta propuesta:\n" +
       (proposedResponse || "(respuesta vacía)");
 
-    const completion = await zai.chat.completions.create({
-      messages: [
-        { role: "assistant", content: VALIDATOR_SYSTEM_PROMPT },
-        { role: "user", content: userMessage },
-      ],
-      thinking: { type: "disabled" },
+    const response = await callLLM({
+      task: "validator",
+      systemPrompt: VALIDATOR_SYSTEM_PROMPT,
+      userMessage,
     });
 
-    const rawText = completion.choices[0]?.message?.content ?? "";
+    const rawText = response.text;
     if (!rawText) return null;
 
     const jsonSlice = extractJsonObject(rawText);

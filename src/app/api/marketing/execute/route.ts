@@ -35,7 +35,7 @@
 //   - DB write failure → 500 (the deliverable is lost; we surface the error).
 
 import { NextRequest, NextResponse } from "next/server";
-import ZAI from "z-ai-web-dev-sdk";
+import { callLLM } from "@/lib/llm/client";
 
 import { db } from "@/lib/db";
 import { MARKETING_CAPABILITIES } from "@/lib/logan-os-data";
@@ -136,15 +136,12 @@ export async function POST(req: NextRequest) {
   // Call the LLM.
   let rawText: string;
   try {
-    const zai = await ZAI.create();
-    const completion = await zai.chat.completions.create({
-      messages: [
-        { role: "assistant", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      thinking: { type: "disabled" },
+    const response = await callLLM({
+      task: "marketing",
+      systemPrompt,
+      userMessage: userPrompt,
     });
-    rawText = completion.choices[0]?.message?.content ?? "";
+    rawText = response.text;
     if (!rawText || rawText.trim().length === 0) {
       console.error("[marketing] LLM devolvió respuesta vacía");
       return unavailable();
