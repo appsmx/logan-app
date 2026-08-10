@@ -33,7 +33,7 @@ async function callZai(config: LLMConfig, request: LLMRequest): Promise<LLMRespo
   const body = {
     model: config.model,
     messages,
-    max_tokens: request.maxTokens || 4096,
+    max_tokens: request.maxTokens || 8192,
     temperature: request.temperature ?? 0.7,
   };
 
@@ -91,7 +91,7 @@ async function callGemini(config: LLMConfig, request: LLMRequest): Promise<LLMRe
     systemInstruction: { parts: [{ text: request.systemPrompt }] },
     contents,
     generationConfig: {
-      maxOutputTokens: request.maxTokens || 4096,
+      maxOutputTokens: request.maxTokens || 8192,
       temperature: request.temperature ?? 0.7,
     },
   };

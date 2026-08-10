@@ -56,16 +56,64 @@ export function listExtraAllowedRepos(): string[] {
  * True if the repo is in LOGAN_ALLOWED_REPOS OR was added at runtime via
  * `addAllowedRepo()` (and is not the forbidden "logan" repo).
  */
-export function isRepoAllowed(repo: string): boolean {
+// Cache: repos that exist in the DB (checked once, cached for 60s to avoid
+// hitting the DB on every git action). Vercel serverless functions are
+// short-lived, so this cache is per-instance and resets on cold start.
+let dbRepoCache: Set<string> | null = null;
+let dbCacheTime = 0;
+const DB_CACHE_TTL = 60_000; // 60 seconds
+
+async function isRepoAllowedInDb(repo: string): Promise<boolean> {
+  // Check cache first
+  const now = Date.now();
+  if (dbRepoCache && (now - dbCacheTime) < DB_CACHE_TTL) {
+    return dbRepoCache.has(repo);
+  }
+  // Refresh cache from DB
+  try {
+    const { db } = await import("@/lib/db");
+    const projects = await db.project.findMany({
+      where: { repo: { not: null } },
+      select: { repo: true },
+    });
+    dbRepoCache = new Set(
+      projects
+        .map((p) => (p.repo || "").trim().toLowerCase())
+        .filter(Boolean),
+    );
+    dbCacheTime = now;
+    return dbRepoCache.has(repo);
+  } catch {
+    // DB not available — fall back to env + in-memory only
+    return false;
+  }
+}
+
+export async function isRepoAllowed(repo: string): Promise<boolean> {
   const r = (repo || "").trim().toLowerCase();
   if (!r) return false;
-  if (FORBIDDEN_REPOS.has(r)) return false; // hardcode — even if env has it
+  if (FORBIDDEN_REPOS.has(r)) return false;
   const allowed = (process.env.LOGAN_ALLOWED_REPOS || "")
     .split(",")
     .map((x) => x.trim().toLowerCase())
     .filter(Boolean);
   if (allowed.includes(r)) return true;
-  // Check the in-memory supplement added by the scaffold endpoint.
+  // Check in-memory supplement
+  if (isExtraAllowedRepo(r)) return true;
+  // Check database — any project with this repo field is allowed
+  return await isRepoAllowedInDb(r);
+}
+
+// Synchronous version for cases where async isn't possible (keeps backward compat)
+export function isRepoAllowedSync(repo: string): boolean {
+  const r = (repo || "").trim().toLowerCase();
+  if (!r) return false;
+  if (FORBIDDEN_REPOS.has(r)) return false;
+  const allowed = (process.env.LOGAN_ALLOWED_REPOS || "")
+    .split(",")
+    .map((x) => x.trim().toLowerCase())
+    .filter(Boolean);
+  if (allowed.includes(r)) return true;
   return isExtraAllowedRepo(r);
 }
 

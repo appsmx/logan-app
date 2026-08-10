@@ -119,7 +119,7 @@ export async function gitCreateBranch(input: GitCreateBranchInput): Promise<GitC
   const branchName = (input.branchName || "").trim();
   const fromBranch = (input.fromBranch || "main").trim();
 
-  if (!isRepoAllowed(repo)) {
+  if (!(await isRepoAllowed(repo))) {
     throw new Error(
       `Repositorio "${repo}" no permitido. LOGAN solo puede modificar: ${listAllowedReposJoined()}.`,
     );
@@ -167,7 +167,7 @@ export async function gitWriteFile(input: GitWriteFileInput): Promise<GitWriteFi
   const content = input.content ?? "";
   const commitMessage = (input.commitMessage || "").trim();
 
-  if (!isRepoAllowed(repo)) {
+  if (!(await isRepoAllowed(repo))) {
     throw new Error(
       `Repositorio "${repo}" no permitido. LOGAN solo puede modificar: ${listAllowedReposJoined()}.`,
     );
@@ -236,7 +236,7 @@ export async function gitCreatePr(input: GitCreatePrInput): Promise<GitCreatePrR
   const hypothesis = (input.hypothesis || "").trim();
   const hypothesisPrediction = (input.hypothesisPrediction || "").trim();
 
-  if (!isRepoAllowed(repo)) {
+  if (!(await isRepoAllowed(repo))) {
     throw new Error(
       `Repositorio "${repo}" no permitido. LOGAN solo puede modificar: ${listAllowedReposJoined()}.`,
     );
@@ -286,7 +286,7 @@ export async function gitCreatePr(input: GitCreatePrInput): Promise<GitCreatePrR
 
 export async function gitGetStatus(input: GitGetStatusInput): Promise<GitGetStatusResult> {
   const repo = (input.repo || "").trim();
-  if (!isRepoAllowed(repo)) {
+  if (!(await isRepoAllowed(repo))) {
     throw new Error(
       `Repositorio "${repo}" no permitido. LOGAN solo puede leer: ${listAllowedReposJoined()}.`,
     );
