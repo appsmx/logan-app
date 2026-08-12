@@ -1,30 +1,72 @@
-// LLM client: provider-agnostic call function.
+// LLM client: provider-agnostic call function with chained fallback.
 // Uses plain fetch — works on Vercel, no SDK auto-injection needed.
+// DEC-LOGAN-006: provider independence.
+// DEC-LOGAN-017: per-task preference chain — tries best model first, falls
+//                back to cheaper/worse on error, never blocks on a single model.
 
 import type { LLMConfig, LLMRequest, LLMResponse, LLMMessage } from "./types";
-import { getLLMConfigWithFallback } from "./config";
+import { getTaskOptions } from "./config";
+
+/**
+ * HTTP status codes that should trigger fallback (don't retry the same model,
+ * try the next in the chain).
+ *
+ * - 401: bad/missing API key
+ * - 403: forbidden (key doesn't have access to this model)
+ * - 404: model doesn't exist (e.g. glm-5.2 may not be deployed yet)
+ * - 408: request timeout from provider
+ * - 429: rate limit / insufficient balance
+ * - 5xx: provider server error
+ */
+const FALLBACK_STATUS = new Set([401, 403, 404, 408, 429, 500, 502, 503, 504]);
 
 export async function callLLM(request: LLMRequest): Promise<LLMResponse> {
-  const config = getLLMConfigWithFallback(request.task);
-
-  // Per-project model override (Task 35): if request.modelOverride is set,
-  // replace the task's default model with the override. The provider (zai |
-  // gemini) stays the same — only the model name is swapped. This lets each
-  // project pick e.g. glm-5.1 for its chatbot even if the task default is
-  // glm-5-turbo.
-  const effectiveConfig: LLMConfig = request.modelOverride
-    ? { ...config, model: request.modelOverride }
-    : config;
-
-  if (effectiveConfig.provider === "zai") {
-    return callZai(effectiveConfig, request);
-  } else if (effectiveConfig.provider === "gemini") {
-    return callGemini(effectiveConfig, request);
+  const options = getTaskOptions(request.task);
+  if (options.length === 0) {
+    throw new Error(
+      "No LLM provider available. Set ZAI_API_KEY or GEMINI_API_KEY.",
+    );
   }
-  throw new Error(`Unknown provider: ${effectiveConfig.provider}`);
+
+  // Try each option in order. Collect errors for diagnostics.
+  const errors: string[] = [];
+  for (let i = 0; i < options.length; i++) {
+    const config = options[i];
+    try {
+      if (config.provider === "zai") {
+        return await callZai(config, request);
+      } else if (config.provider === "gemini") {
+        return await callGemini(config, request);
+      }
+      errors.push(`[${config.provider}/${config.model}] unknown provider`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      errors.push(`[${config.provider}/${config.model}] ${msg}`);
+
+      // Decide whether to fall back or rethrow.
+      // Network errors and FALLBACK_STATUS errors → try next option.
+      // Other errors (e.g. malformed response after a 200) → still try next
+      // because we want resilience.
+      // If this was the last option, we'll throw below.
+      if (i === options.length - 1) {
+        // No more options — throw a combined error.
+        throw new Error(
+          `All LLM options failed for task "${request.task}":\n${errors.join("\n")}`,
+        );
+      }
+      // Otherwise: log and try the next option.
+      console.warn(
+        `[llm] task="${request.task}" option ${i + 1}/${options.length} ` +
+          `(${config.provider}/${config.model}) failed: ${msg}. Trying next.`,
+      );
+    }
+  }
+
+  // Should never reach here (loop either returns or throws), but TS safety.
+  throw new Error(`LLM call failed for task "${request.task}"`);
 }
 
-// Z.ai API (OpenAI-compatible format)
+// ─── Z.ai (OpenAI-compatible format) ─────────────────────────────────────────
 async function callZai(config: LLMConfig, request: LLMRequest): Promise<LLMResponse> {
   const url = `${config.baseUrl}/chat/completions`;
 
@@ -42,7 +84,7 @@ async function callZai(config: LLMConfig, request: LLMRequest): Promise<LLMRespo
   const body = {
     model: config.model,
     messages,
-    max_tokens: request.maxTokens || 4096,
+    max_tokens: request.maxTokens || 8192,
     temperature: request.temperature ?? 0.7,
   };
 
@@ -57,11 +99,19 @@ async function callZai(config: LLMConfig, request: LLMRequest): Promise<LLMRespo
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(`Z.ai API ${res.status}: ${err.error?.message || res.statusText}`);
+    const msg = err.error?.message || res.statusText;
+    const e = new Error(`Z.ai API ${res.status}: ${msg}`);
+    // Attach status so caller can decide whether to fall back.
+    (e as Error & { status?: number }).status = res.status;
+    throw e;
   }
 
   const data = await res.json();
   const text = data.choices?.[0]?.message?.content || "";
+
+  if (!text.trim()) {
+    throw new Error("Z.ai returned empty response");
+  }
 
   return {
     text,
@@ -75,7 +125,7 @@ async function callZai(config: LLMConfig, request: LLMRequest): Promise<LLMRespo
   };
 }
 
-// Gemini API (Google format — contents + parts + systemInstruction)
+// ─── Gemini (Google format) ──────────────────────────────────────────────────
 async function callGemini(config: LLMConfig, request: LLMRequest): Promise<LLMResponse> {
   const url = `${config.baseUrl}/models/${config.model}:generateContent?key=${config.apiKey}`;
 
@@ -100,7 +150,7 @@ async function callGemini(config: LLMConfig, request: LLMRequest): Promise<LLMRe
     systemInstruction: { parts: [{ text: request.systemPrompt }] },
     contents,
     generationConfig: {
-      maxOutputTokens: request.maxTokens || 4096,
+      maxOutputTokens: request.maxTokens || 8192,
       temperature: request.temperature ?? 0.7,
     },
   };
@@ -113,11 +163,18 @@ async function callGemini(config: LLMConfig, request: LLMRequest): Promise<LLMRe
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(`Gemini API ${res.status}: ${err.error?.message || res.statusText}`);
+    const msg = err.error?.message || res.statusText;
+    const e = new Error(`Gemini API ${res.status}: ${msg}`);
+    (e as Error & { status?: number }).status = res.status;
+    throw e;
   }
 
   const data = await res.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+  if (!text.trim()) {
+    throw new Error("Gemini returned empty response");
+  }
 
   return {
     text,
