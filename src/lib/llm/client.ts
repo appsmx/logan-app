@@ -5,7 +5,7 @@
 //                back to cheaper/worse on error, never blocks on a single model.
 
 import type { LLMConfig, LLMRequest, LLMResponse, LLMMessage } from "./types";
-import { getTaskOptions } from "./config";
+import { getLLMConfigWithFallback } from "./config";
 
 /**
  * HTTP status codes that should trigger fallback (don't retry the same model,
@@ -21,7 +21,7 @@ import { getTaskOptions } from "./config";
 const FALLBACK_STATUS = new Set([401, 403, 404, 408, 429, 500, 502, 503, 504]);
 
 export async function callLLM(request: LLMRequest): Promise<LLMResponse> {
-  const options = getTaskOptions(request.task);
+  const options = getLLMConfigWithFallback(request.task);
   if (options.length === 0) {
     throw new Error(
       "No LLM provider available. Set ZAI_API_KEY or GEMINI_API_KEY.",
