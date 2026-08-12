@@ -1,5 +1,7 @@
 // LLM provider-agnostic types
 // DEC-LOGAN-006: LOGAN is independent of the provider.
+// DEC-LOGAN-017: Mix of GLM-5.2/5.1/5-turbo by task criticality, with chained fallback.
+//                If the preferred model fails (404/429/401), try the next in the chain.
 
 export type LLMProvider = "zai" | "gemini";
 
