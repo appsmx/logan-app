@@ -2,7 +2,7 @@
 //
 // Builds the system prompt dynamically from the project's Biblia (the product
 // context). The bot speaks in the PRODUCT's voice (e.g. "Soy el asistente de
-// Mariscos El Jona"), NOT LOGAN's voice. This is the key differentiator from
+// Mariscos Quiroa"), NOT LOGAN's voice. This is the key differentiator from
 // LOGAN Core.
 //
 // The prompt enforces:

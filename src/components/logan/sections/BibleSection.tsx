@@ -351,7 +351,7 @@ function StateTab() {
             Nombre del repo de GitHub que LOGAN debe usar por defecto al emitir
             acciones git (branches, archivos, PRs) para este proyecto. Debe estar
             en <code className="rounded bg-muted px-1 py-0.5">LOGAN_ALLOWED_REPOS</code>{" "}
-            (mrtramite, mariscoseljona). Vacío = sin repo asociado; LOGAN te
+            (mrtramite, mariscosquiroa). Vacío = sin repo asociado; LOGAN te
             preguntará qué repo usar antes de emitir acciones git.
           </p>
         </div>

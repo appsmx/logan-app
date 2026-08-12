@@ -46,7 +46,7 @@ Cada vez que un especialista decide algo, registra una **hipótesis** (contexto,
 ## Casos reales
 
 - Mr. Trámite (https://mrtramite.vercel.app) — gestión de trámites.
-- Mariscos El Jona (https://github.com/appsmx/mariscoseljona) — restaurante digitalizado.
+- Mariscos Quiroa (https://github.com/appsmx/mariscosquiroa, mariscosquiroa.com) — distribuidora de mariscos digitalizada.
 - Hércules Bro — próximamente.`;
 
 export function buildShowcaseSystemPrompt(): string {

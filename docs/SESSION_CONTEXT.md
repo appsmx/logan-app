@@ -70,7 +70,7 @@ Llevar a LOGAN OS desde "2 agentes funcionales (Core + Marketing)" hasta "9/9 ro
 | `src/lib/git/github-client.ts` | `isRepoAllowed` ahora async + `isRepoAllowedInDb()` con cache 60s. |
 | `src/lib/git/tools.ts` | 4 call sites actualizados a `await isRepoAllowed()`. |
 | `src/lib/llm/config.ts` | Mix GLM-5.2/5.1/5-turbo consolidado (corrige lo que el worklog Task 33 decía sobre `gemini-2.5-flash` para todo). |
-| `.env.example` | `LOGAN_ALLOWED_REPOS=mrtramite,mariscoseljona,logan-app` (3 repos, antes 2). |
+| `.env.example` | `LOGAN_ALLOWED_REPOS=mrtramite,mariscosquiroa,logan-app` (3 repos, antes 2). |
 
 ---
 
@@ -82,7 +82,7 @@ Llevar a LOGAN OS desde "2 agentes funcionales (Core + Marketing)" hasta "9/9 ro
 3. **Cargar $200 USD en Z.ai** cuando haya capital. Hoy el tier gratuito de GLM puede tener saturación o agotarse — la app devuelve `503 LOGAN Core no disponible` cuando esto ocurre.
 4. **Activar Vercel Pro** ($20/mes) cuando el flujo de 3 llamadas LLM exceda el timeout free de 10s en producción (DEC-LOGAN-013). Hoy por hoy el tier free funciona para turnos sin delegación (~5-8s).
 5. **Reemplazar placeholders en `/showcase`** (teléfono de contacto, email de ventas).
-6. **Conectar WhatsApp Cloud API** a productos (Mr. Trámite, Mariscos El Jona) usando el template `templates/asistente-ia/` del repo `logan`.
+6. **Conectar WhatsApp Cloud API** a productos (Mr. Trámite, Mariscos Quiroa) usando el template `templates/asistente-ia/` del repo `logan`.
 7. **Crear nuevos productos con Scaffolding** — capability `scaffold_project` de LOGAN Dev. Ejemplo: "Crea un proyecto para Ferretería Don Juan" → genera repo + Biblia + estructura.
 
 ### Estratégicos

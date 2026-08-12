@@ -13,7 +13,7 @@
  * Derive a URL-safe slug from a product name.
  *
  * "Ferretería Don Juan" → "ferreteria-don-juan"
- * "Mariscos El Jona"    → "mariscos-el-jona"
+ * "Mariscos Quiroa"    → "mariscos-quiroa"
  * "Café & Panadería"    → "cafe-panaderia"
  * "¡Logan OS!"          → "logan-os"
  *

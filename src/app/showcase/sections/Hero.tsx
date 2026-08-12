@@ -168,7 +168,7 @@ export function Hero() {
           className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] uppercase tracking-widest text-[oklch(0.55_0.012_70)]"
         >
           <span>· Mr. Trámite</span>
-          <span>· Mariscos El Jona</span>
+          <span>· Mariscos Quiroa</span>
           <span>· Hércules Bro (próximamente)</span>
         </motion.div>
       </div>

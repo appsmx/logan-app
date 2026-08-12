@@ -307,7 +307,7 @@ Cuando el usuario pida **crear un producto nuevo desde cero** (NO modificar uno 
 
 **Campos y reglas de derivación (Task 31)**:
 
-- **\`productName\`**: el nombre humano del producto, tal cual lo escribió el usuario (conserva acentos y mayúsculas). Ej: "Ferretería Don Juan", "Mariscos El Jona".
+- **\`productName\`**: el nombre humano del producto, tal cual lo escribió el usuario (conserva acentos y mayúsculas). Ej: "Ferretería Don Juan", "Mariscos Quiroa".
 
 - **\`productSlug\`**: DERIVA de \`productName\` con estas reglas (el backend también lo hace como red de seguridad si lo omites, pero hazlo tú para ser explícito):
   1. lowercase
@@ -317,7 +317,7 @@ Cuando el usuario pida **crear un producto nuevo desde cero** (NO modificar uno 
   5. espacios → guiones
   6. colapsa múltiples guiones en uno
   7. quita guiones al inicio/final
-  Ej: "Ferretería Don Juan" → "ferreteria-don-juan". "Mariscos El Jona" → "mariscos-el-jona". "Café & Panadería" → "cafe-panaderia".
+  Ej: "Ferretería Don Juan" → "ferreteria-don-juan". "Mariscos Quiroa" → "mariscos-quiroa". "Café & Panadería" → "cafe-panaderia".
 
 - **\`repoName\`**: extráelo de la URL de GitHub si el usuario pegó una. Si el usuario dijo "Repo: https://github.com/appsmx/ferreteria-don-juan", el \`repoName\` es "ferreteria-don-juan" (lo que va después del owner en la URL, sin .git). Si el usuario dijo "repo: ferreteria-don-juan" (sin URL), úsalo tal cual. Si el usuario NO menciona repo, usa \`productSlug\` como valor por defecto (y avísale al usuario en tu \`response\`).
 
@@ -331,11 +331,11 @@ Cuando el usuario pida **crear un producto nuevo desde cero** (NO modificar uno 
 
 **Ejemplo completo (lenguaje natural → acción)**:
 
-Usuario dice: "Crea un proyecto para Mariscos El Jona. Repo: https://github.com/appsmx/mariscoseljona. Visión: mariscos frescos con pedidos por WhatsApp en Rosarito. Usuarios: familias de Rosarito, restaurantes locales."
+Usuario dice: "Crea un proyecto para Mariscos Quiroa. Repo: https://github.com/appsmx/mariscosquiroa. Visión: mariscos frescos con pedidos por WhatsApp en Rosarito. Usuarios: familias de Rosarito, restaurantes locales."
 
 → Emites:
 \`\`\`
-{ "type": "scaffold_project", "productName": "Mariscos El Jona", "productSlug": "mariscos-el-jona", "vision": "mariscos frescos con pedidos por WhatsApp en Rosarito.", "users": ["familias de Rosarito", "restaurantes locales"], "repoMode": "existing", "repoName": "mariscoseljona" }
+{ "type": "scaffold_project", "productName": "Mariscos Quiroa", "productSlug": "mariscos-quiroa", "vision": "mariscos frescos con pedidos por WhatsApp en Rosarito.", "users": ["familias de Rosarito", "restaurantes locales"], "repoMode": "existing", "repoName": "mariscosquiroa" }
 \`\`\`
 
 Nota: \`productSlug\` se deriva del nombre (separando palabras con guiones) mientras que \`repoName\` se extrae de la URL tal cual (puede o no tener guiones, según el usuario lo creó en GitHub). Pueden coincidir o no — eso es normal.

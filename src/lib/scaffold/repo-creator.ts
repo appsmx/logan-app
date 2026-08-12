@@ -4,7 +4,7 @@
 //   1. `create`   — try POST /user/repos (or POST /orgs/{owner}/repos) to make
 //                   a new GitHub repo. The fine-grained PAT used in this
 //                   sandbox is scoped to specific repos (mrtramite +
-//                   mariscoseljona) and does NOT have repo-creation permission.
+//                   mariscosquiroa) and does NOT have repo-creation permission.
 //                   When that's the case, we return a clear `REPO_CREATE_FORBIDDEN`
 //                   error explaining the user must create the repo manually and
 //                   then use `repoMode="existing"`.

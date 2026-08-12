@@ -28,14 +28,14 @@ const PROJECTS: Project[] = [
     emoji: "📋",
   },
   {
-    id: "mariscos-el-jona",
-    name: "Mariscos El Jona",
-    category: "Restaurante digitalizado",
+    id: "mariscos-quiroa",
+    name: "Mariscos Quiroa",
+    category: "Distribuidora de mariscos digitalizada",
     description:
-      "Restaurante de mariscos con catálogo digital, pedidos en línea y gestión interna. LOGAN diseñó, construyó y administra la operación.",
-    href: "https://github.com/appsmx/mariscoseljona",
-    hrefLabel: "Ver repositorio",
-    status: "repo",
+      "Distribuidora de pescados y mariscos en Rosarito, BC. Catálogo digital, cotización por WhatsApp, gestión de pedidos. LOGAN diseñó y opera el bot conversacional del producto.",
+    href: "https://mariscosquiroa.com",
+    hrefLabel: "Ver proyecto",
+    status: "live",
     emoji: "🦐",
   },
   {
