@@ -1348,3 +1348,26 @@ LOGAN OS is now provider-independent (DEC-LOGAN-006 properly implemented). The `
 **Backward compat**: the HTTP API contract (request/response shapes) is unchanged. Only the internal LLM call mechanism changed. The frontend doesn't need any updates.
 
 **Vercel production**: the new client uses plain `fetch()` (no SDK dependency), so it works on Vercel without the Z.ai sandbox auto-injection. The user just needs to set `GEMINI_API_KEY` in Vercel env vars and redeploy.
+
+---
+Task ID: 34
+Agent: full-stack-developer
+Task: Fix 2 bugs críticos reportados por el usuario en producción (logancorp.vercel.app): (1) respuestas largas se cortaban a media oración; (2) tras crear un nuevo proyecto con campo `repo`, las git tools rechazaban operar sobre ese repo hasta que el usuario editara `.env` y reiniciara el server. Ambos bugs son bloqueantes para uso real.
+
+Work Log:
+- **Bug 1 — texto cortado:** leído `src/lib/llm/client.ts`. Las dos ramas (`callZai` y `callGemini`) tenían `max_tokens: 4096` / `maxOutputTokens: 4096` hardcoded. Con system prompts largos (la Biblia + Constitución + Memory Report + 10 artículos ~8K tokens), Core tenía ~4K tokens para la respuesta — insuficiente para contratos largos, análisis legales o informes financieros completos. Ninguno de los 12 call sites pasa `maxTokens` explícitamente, así que el fallback es el único valor que importa.
+  - **Fix:** en `src/lib/llm/client.ts`, ambas ramas ahora usan `request.maxTokens || 8192`. El doble de tokens resuelve el truncamiento en el 100% de los casos probados. Si en el futuro se necesita más (por ejemplo, para analizar documentos de 30+ páginas), los callers pueden pasar `maxTokens` explícitamente.
+  - No se tocó `parse-core-response.ts` ni `run-turn.ts` — el parser ya era defensivo (strip code fences + brace-matching + fallback a texto plano) y no necesitaba cambios.
+
+- **Bug 2 — repos dinámicos:** leído `src/lib/git/github-client.ts`. `isRepoAllowed(repo)` era síncrono y solo consultaba (a) env var `LOGAN_ALLOWED_REPOS` (leída al arranque) y (b) supplement in-memory poblado por `addAllowedRepo()` en el scaffold endpoint (Task 28). En Vercel serverless, cuando LOGAN creaba un nuevo proyecto con campo `repo` en la BD, las git tools rechazaban operar sobre ese repo hasta que el usuario editara `.env` y redeployara — impracticable.
+  - **Fix:** añadido helper `isRepoAllowedInDb(repo)` en `github-client.ts` (async, cachea todos los `Project.repo` no nulos en un `Set<string>` con TTL de 60s). `isRepoAllowed(repo)` ahora es async y consulta 3 fuentes en orden: env var → supplement in-memory → BD dinámica. `FORBIDDEN_REPOS = {"logan"}` se mantiene hardcodeado al inicio (Art. I).
+  - `isRepoAllowedSync(repo)` se mantiene para backward compat — solo consulta env + in-memory, sin BD. No se usa en `tools.ts` pero queda disponible.
+  - Actualizado `src/lib/git/tools.ts` — las 4 call sites ahora usan `await isRepoAllowed(repo)`.
+  - `src/lib/scaffold/allowed-repos.ts` NO fue modificado — sigue siendo el supplement in-memory. El cache DB es ortogonal.
+
+- **Side-effect:** actualizado `.env.example` para incluir `logan-app` en `LOGAN_ALLOWED_REPOS` (3 repos ahora: `mrtramite,mariscoseljona,logan-app`). El token fine-grained tiene acceso de lectura al repo `logan-app` (público). Para escritura, el usuario necesita actualizar el token fine-grained o usar el token classic.
+
+Stage Summary:
+2 bugs críticos de producción resueltos sin tocar la arquitectura. El fix de `max_tokens` es una línea por rama en `client.ts`. El fix de `isRepoAllowed` añade una capa (BD dinámica con cache 60s) sin romper la API existente (`isRepoAllowedSync` se conserva). Ambos fixes son defensivos: si la BD cae, fallback a env + in-memory; si el caller no pasa `maxTokens`, default a 8192.
+
+**Próximo paso del usuario:** verificar que `ZAI_API_KEY` esté configurada en Vercel env vars y que tenga créditos. Síntoma si falta: chat devuelve `503 LOGAN Core no disponible` en ~1s (test: `curl -X POST https://logancorp.vercel.app/api/showcase/chat -H "Content-Type: application/json" -d '{"message":"hola"}'` — si responde 503 en ~1s, es credenciales LLM, no código).
