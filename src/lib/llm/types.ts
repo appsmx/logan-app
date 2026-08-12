@@ -1,7 +1,5 @@
 // LLM provider-agnostic types
 // DEC-LOGAN-006: LOGAN is independent of the provider.
-// DEC-LOGAN-017: Mix of GLM-5.2/5.1/5-turbo by task criticality, with chained fallback.
-//                If the preferred model fails (404/429/401), try the next in the chain.
 
 export type LLMProvider = "zai" | "gemini";
 
@@ -31,6 +29,12 @@ export interface LLMRequest {
   history?: LLMMessage[];
   maxTokens?: number;
   temperature?: number;
+  // Per-project model override (Task 35). If set, callLLM uses this model
+  // instead of the TASK_MODEL_MAP default. The provider (zai|gemini) is still
+  // chosen via the task's mapping — only the model name is overridden.
+  // Reseller feature: a project can pick glm-5.1 even if the task default is
+  // glm-5-turbo.
+  modelOverride?: string;
 }
 
 export interface LLMResponse {
