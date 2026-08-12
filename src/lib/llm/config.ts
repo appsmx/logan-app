@@ -23,32 +23,39 @@ const ZAI_BASE_URL = "https://api.z.ai/api/paas/v4";
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 
 // ─── Task → preference list ─────────────────────────────────────────────────
-// Ordered by QUALITY (best first) — runtime falls back to cheaper/worse on error.
+// Ordered by COST-EFFICIENCY (free first, paid only when needed).
 //
-// GLM-5.2 tier (máxima calidad, ~$5/$15 per 1M tokens):
-//   - core_decide, core_integrate, dev
-//   These are the places where LOGAN needs to reason deepest. An error here
-//   costs the most (bug in production, wrong delegation, etc.).
+// STRATEGY (DEC-LOGAN-017 rev. 2026-08-12):
+// The previous version always tried GLM-5.x first and fell back to Gemini.
+// That burned Z.ai credits even for trivial tasks (chat, validator, etc.).
+// Now we INVERT the order for non-critical tasks: Gemini free tier first,
+// GLM only if Gemini is unavailable or rate-limited.
 //
-// GLM-5.1 tier (buena calidad, ~$2/$6 per 1M tokens):
-//   - design, analytics, legal
-//   Need precision (a bad legal analysis is dangerous), but not critical
-//   for ecosystem coordination.
+// GLM-5.2 is reserved for the 3 tasks where quality truly matters
+// (Core decide/integrate + Dev). Everything else uses Gemini Flash first.
 //
-// GLM-5-turbo tier (rápido y barato, ~$0.1/$0.3 per 1M tokens):
-//   - validator, marketing, finance, support, assistant, showcase
-//   Customer-facing (latency-sensitive) or simple/routine tasks.
+// Cost comparison per 1M tokens (approx):
+//   gemini-2.0-flash: $0 (free tier, 1500 req/day)
+//   glm-5-turbo:      $0.10 / $0.30  (input/output)
+//   glm-4-flash:      $0.05 / $0.15
+//   glm-4.6:          $0.50 / $1.50
+//   glm-5.1:          $2.00 / $6.00
+//   glm-5.2:          $5.00 / $15.00
 //
-// Each tier falls back to GLM-4.6 (mid-tier workhorse, ~$0.5/$1.5 per 1M tokens)
-// if the 5.x model is unavailable or out of credits, then to Gemini Flash
-// (free tier) as the safety net.
-//
-// GLM-4-flash is an even cheaper option for the turbo tier (~$0.05/$0.15 per 1M).
+// Estimated savings:
+//   Showcase/Assistant chat: 100% free (Gemini free tier handles them)
+//   Validator: 100% free (runs on every Core turn, was burning GLM credits)
+//   Marketing/Finance/Legal/Support: 95%+ free (occasional Gemini rate limit)
+//   Core (decide+integrate): unchanged (still GLM-5.2 for quality)
+//   Net result: ~80-90% reduction in Z.ai spend for typical usage.
 
 type ModelOption = { provider: LLMProvider; model: string };
 
 const TASK_PREFERENCE_MAP: Record<LLMTask, ModelOption[]> = {
-  // ─── GLM-5.2 tier (máxima calidad) ───────────────────────────────────────
+  // ─── GLM-5.2 tier (máxima calidad — los 3 únicos que realmente la necesitan) ─
+  // Cost: ~$0.025-0.05 per Core turn (worth it — wrong delegation = expensive bug).
+  // Falls back to glm-4.6 (10x cheaper, similar quality) if GLM-5.2 unavailable.
+  // Falls back to gemini-2.0-flash only if Z.ai is completely down.
   core_decide: [
     { provider: "zai", model: "glm-5.2" },
     { provider: "zai", model: "glm-4.6" },
@@ -65,57 +72,59 @@ const TASK_PREFERENCE_MAP: Record<LLMTask, ModelOption[]> = {
     { provider: "gemini", model: "gemini-2.0-flash" },
   ],
 
-  // ─── GLM-5.1 tier (buena calidad) ────────────────────────────────────────
+  // ─── Gemini-first tier (todo lo demás) ───────────────────────────────────
+  // Gemini 2.0 Flash free tier is genuinely good for routine work — design
+  // specs, analytics pattern detection, legal docs, marketing copy, support
+  // FAQs, chatbot answers. The quality gap vs GLM-5.x is small for these tasks,
+  // and $0 > $0.001-0.005 per turn.
+  //
+  // Falls back to glm-5-turbo (cheap) → glm-4.6 (workhorse) → fail.
+  // Note: we put glm-5-turbo BEFORE glm-4.6 here because for these tasks
+  // speed matters more than precision (customer-facing, etc.).
   design: [
-    { provider: "zai", model: "glm-5.1" },
-    { provider: "zai", model: "glm-4.6" },
     { provider: "gemini", model: "gemini-2.0-flash" },
+    { provider: "zai", model: "glm-5-turbo" },
+    { provider: "zai", model: "glm-4.6" },
   ],
   analytics: [
-    { provider: "zai", model: "glm-5.1" },
-    { provider: "zai", model: "glm-4.6" },
     { provider: "gemini", model: "gemini-2.0-flash" },
+    { provider: "zai", model: "glm-5-turbo" },
+    { provider: "zai", model: "glm-4.6" },
   ],
   legal: [
-    { provider: "zai", model: "glm-5.1" },
-    { provider: "zai", model: "glm-4.6" },
     { provider: "gemini", model: "gemini-2.0-flash" },
-  ],
-
-  // ─── GLM-5-turbo tier (rápido y barato — customer-facing + rutinarias) ─
-  validator: [
     { provider: "zai", model: "glm-5-turbo" },
-    { provider: "zai", model: "glm-4-flash" },
     { provider: "zai", model: "glm-4.6" },
+  ],
+  validator: [
     { provider: "gemini", model: "gemini-2.0-flash" },
+    { provider: "zai", model: "glm-5-turbo" },
+    { provider: "zai", model: "glm-4.6" },
   ],
   marketing: [
-    { provider: "zai", model: "glm-5-turbo" },
-    { provider: "zai", model: "glm-4-flash" },
-    { provider: "zai", model: "glm-4.6" },
     { provider: "gemini", model: "gemini-2.0-flash" },
+    { provider: "zai", model: "glm-5-turbo" },
+    { provider: "zai", model: "glm-4.6" },
   ],
   finance: [
-    { provider: "zai", model: "glm-5-turbo" },
-    { provider: "zai", model: "glm-4-flash" },
-    { provider: "zai", model: "glm-4.6" },
     { provider: "gemini", model: "gemini-2.0-flash" },
+    { provider: "zai", model: "glm-5-turbo" },
+    { provider: "zai", model: "glm-4.6" },
   ],
   support: [
-    { provider: "zai", model: "glm-5-turbo" },
-    { provider: "zai", model: "glm-4-flash" },
-    { provider: "zai", model: "glm-4.6" },
     { provider: "gemini", model: "gemini-2.0-flash" },
+    { provider: "zai", model: "glm-5-turbo" },
+    { provider: "zai", model: "glm-4.6" },
   ],
   assistant: [
-    { provider: "zai", model: "glm-5-turbo" },
-    { provider: "zai", model: "glm-4-flash" },
     { provider: "gemini", model: "gemini-2.0-flash" },
+    { provider: "zai", model: "glm-5-turbo" },
+    { provider: "zai", model: "glm-4.6" },
   ],
   showcase: [
-    { provider: "zai", model: "glm-5-turbo" },
-    { provider: "zai", model: "glm-4-flash" },
     { provider: "gemini", model: "gemini-2.0-flash" },
+    { provider: "zai", model: "glm-5-turbo" },
+    { provider: "zai", model: "glm-4.6" },
   ],
 };
 
