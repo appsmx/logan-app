@@ -32,6 +32,10 @@ import { NextRequest } from "next/server";
 
 import { runCoreTurn, CoreTurnError, type CoreTurnProgress } from "@/lib/core/run-turn";
 
+// Vercel function timeout — Hobby plan supports up to 60s.
+// SSE streaming keeps the connection open during 3-LLM turns (25-30s typical).
+export const maxDuration = 60;
+
 type CoreRequestBody = { projectId?: string; message?: string };
 
 function sseEncode(event: string, data: unknown): string {

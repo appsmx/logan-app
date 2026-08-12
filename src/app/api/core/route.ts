@@ -45,6 +45,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { callLLM } from "@/lib/llm/client";
 
+// Vercel function timeout — Hobby plan supports up to 60s.
+// Core turns with delegation (3 LLM calls) can take 25-30s; without this
+// explicit setting, Vercel uses the default (10s) which would 504 those turns.
+export const maxDuration = 60;
+
 import { db } from "@/lib/db";
 import { buildMemoryReport } from "@/lib/core/memory-report";
 import { buildSystemPrompt } from "@/lib/core/system-prompt";
