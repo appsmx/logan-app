@@ -1,5 +1,5 @@
 // LOGAN OS middleware — protege el panel de administración.
-// Solo el showcase y los endpoints públicos están abiertos.
+// Solo el showcase, login y endpoints públicos están abiertos.
 // Todo lo demás requiere autenticación (cookie logan_auth).
 
 import { NextResponse } from "next/server";
@@ -7,6 +7,8 @@ import type { NextRequest } from "next/server";
 
 const PUBLIC_ROUTES = [
   "/showcase",
+  "/login",
+  "/api/login",
   "/api/showcase",
   "/api/assistant/chat",
   "/api/usage",
@@ -29,7 +31,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Rutas públicas → dejar pasar
-  if (isPublicRoute(pathname) || pathname === "/login") {
+  if (isPublicRoute(pathname)) {
     return NextResponse.next();
   }
 
