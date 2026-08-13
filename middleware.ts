@@ -1,6 +1,4 @@
 // LOGAN OS middleware — protege el panel de administración.
-// Solo el showcase, login y endpoints públicos están abiertos.
-// Todo lo demás requiere autenticación (cookie logan_auth).
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
@@ -22,22 +20,32 @@ function isPublicRoute(pathname: string): boolean {
   return PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
 }
 
+function isAuthenticated(request: NextRequest): boolean {
+  const authCookie = request.cookies.get("logan_auth");
+  return authCookie?.value === "authenticated";
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const authed = isAuthenticated(request);
 
-  // Raíz → redirigir al showcase
+  // Raíz:
+  // - Si autenticado → dejar pasar a LOGAN OS
+  // - Si no autenticado → redirigir al showcase
   if (pathname === "/") {
+    if (authed) {
+      return NextResponse.next();
+    }
     return NextResponse.redirect(new URL("/showcase", request.url));
   }
 
-  // Rutas públicas → dejar pasar
+  // Rutas públicas → siempre dejar pasar
   if (isPublicRoute(pathname)) {
     return NextResponse.next();
   }
 
   // Todo lo demás → verificar autenticación
-  const authCookie = request.cookies.get("logan_auth");
-  if (authCookie?.value === "authenticated") {
+  if (authed) {
     return NextResponse.next();
   }
 
