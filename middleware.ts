@@ -67,7 +67,7 @@ export function middleware(request: NextRequest) {
   }
 
   // --- Agregar CORS headers a respuestas de API pública ---
-  if (pathname.startsWith("/api/assistant/") || pathname.startsWith("/api/showcase/")) {
+  if (pathname.startsWith("/api/assistant/") || pathname.startsWith("/api/showcase/") || pathname.includes("/update-vision")) {
     const authed = isAuthenticated(request);
     
     // Estas rutas son públicas, dejar pasar
