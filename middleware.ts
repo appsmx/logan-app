@@ -9,6 +9,7 @@ const PUBLIC_ROUTES = [
   "/api/login",
   "/api/showcase",
   "/api/assistant/chat",
+  "/api/projects/", // Needed for update-vision endpoint (protected by its own secret)
   "/api/usage",
   "/_next",
   "/favicon",
