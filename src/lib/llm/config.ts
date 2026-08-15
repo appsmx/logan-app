@@ -1,23 +1,24 @@
 // LLM configuration: per-task provider + model selection.
 // DEC-LOGAN-006: independence del proveedor.
-// getLLMConfigWithFallback returns an ARRAY of options (best first) for the
-// fallback chain in client.ts.
+// Ahora: Gemini como primario (gratis), Z.ai como fallback (cuando haya créditos).
 
 import type { LLMConfig, LLMTask, LLMProvider } from "./types";
 
+// Gemini es primario (gratis, 1500 req/día free tier)
+// Z.ai es fallback (cuando tenga créditos, mejor calidad)
 const TASK_MODEL_MAP: Record<LLMTask, { provider: LLMProvider; model: string }> = {
-  core_decide:     { provider: "zai", model: "glm-5-turbo" },
-  core_integrate:  { provider: "zai", model: "glm-5-turbo" },
+  core_decide:     { provider: "gemini", model: "gemini-flash-latest" },
+  core_integrate:  { provider: "gemini", model: "gemini-flash-latest" },
   dev:             { provider: "zai", model: "glm-5.2" },
-  design:          { provider: "zai", model: "glm-5.1" },
-  analytics:       { provider: "zai", model: "glm-5.1" },
-  legal:           { provider: "zai", model: "glm-5.1" },
-  validator:       { provider: "zai", model: "glm-5-turbo" },
-  marketing:       { provider: "zai", model: "glm-5-turbo" },
-  finance:         { provider: "zai", model: "glm-5-turbo" },
-  support:         { provider: "zai", model: "glm-5-turbo" },
-  assistant:       { provider: "zai", model: "glm-5-turbo" },
-  showcase:        { provider: "zai", model: "glm-5-turbo" },
+  design:          { provider: "gemini", model: "gemini-flash-latest" },
+  analytics:       { provider: "gemini", model: "gemini-flash-latest" },
+  legal:           { provider: "gemini", model: "gemini-flash-latest" },
+  validator:       { provider: "gemini", model: "gemini-flash-latest" },
+  marketing:       { provider: "gemini", model: "gemini-flash-latest" },
+  finance:         { provider: "gemini", model: "gemini-flash-latest" },
+  support:         { provider: "gemini", model: "gemini-flash-latest" },
+  assistant:       { provider: "gemini", model: "gemini-flash-latest" },
+  showcase:        { provider: "gemini", model: "gemini-flash-latest" },
 };
 
 export function getLLMConfig(task: LLMTask): LLMConfig {
@@ -36,16 +37,17 @@ export function getLLMConfigWithFallback(task: LLMTask): LLMConfig[] {
   const primary = getLLMConfig(task);
   const options: LLMConfig[] = [];
 
+  // Primario
   if (isProviderAvailable(primary.provider)) {
     options.push(primary);
   }
 
-  // Add fallback: if primary is zai, try gemini. If primary is gemini, try zai.
+  // Fallback: el otro proveedor
+  if (primary.provider === "gemini" && isProviderAvailable("zai")) {
+    options.push(buildConfig("zai", "glm-5-turbo"));
+  }
   if (primary.provider === "zai" && isProviderAvailable("gemini")) {
     options.push(buildConfig("gemini", "gemini-flash-latest"));
-  }
-  if (primary.provider === "gemini" && isProviderAvailable("zai")) {
-    options.push(buildConfig("zai", "glm-4.6"));
   }
 
   return options;
