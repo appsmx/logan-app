@@ -1,14 +1,12 @@
-// LLM configuration: per-task provider + model selection.
+// LLM configuration: 3 providers with fallback chain.
+// Z.ai (primario) → Gemini (secundario) → OpenAI (terciario).
 // DEC-LOGAN-006: independence del proveedor.
-// Ahora: Gemini como primario (gratis), Z.ai como fallback (cuando haya créditos).
 
 import type { LLMConfig, LLMTask, LLMProvider } from "./types";
 
-// Gemini es primario (gratis, 1500 req/día free tier)
-// Z.ai es fallback (cuando tenga créditos, mejor calidad)
 const TASK_MODEL_MAP: Record<LLMTask, { provider: LLMProvider; model: string }> = {
-  core_decide:     { provider: "gemini", model: "gemini-flash-latest" },
-  core_integrate:  { provider: "gemini", model: "gemini-flash-latest" },
+  core_decide:     { provider: "zai", model: "glm-5-turbo" },
+  core_integrate:  { provider: "zai", model: "glm-5-turbo" },
   dev:             { provider: "zai", model: "glm-5.2" },
   design:          { provider: "gemini", model: "gemini-flash-latest" },
   analytics:       { provider: "gemini", model: "gemini-flash-latest" },
@@ -29,25 +27,29 @@ export function getLLMConfig(task: LLMTask): LLMConfig {
 export function isProviderAvailable(provider: LLMProvider): boolean {
   if (provider === "zai") return !!process.env.ZAI_API_KEY;
   if (provider === "gemini") return !!process.env.GEMINI_API_KEY;
+  if (provider === "openai") return !!process.env.OPENAI_API_KEY;
   return false;
 }
 
-// Returns an ARRAY of options (best first) for the fallback chain.
+// Returns an ARRAY of options for the fallback chain.
+// Order: primary → secondary → tertiary
 export function getLLMConfigWithFallback(task: LLMTask): LLMConfig[] {
   const primary = getLLMConfig(task);
   const options: LLMConfig[] = [];
 
-  // Primario
   if (isProviderAvailable(primary.provider)) {
     options.push(primary);
   }
 
-  // Fallback: el otro proveedor
-  if (primary.provider === "gemini" && isProviderAvailable("zai")) {
+  // Fallback chain: try all providers that are available
+  if (primary.provider !== "zai" && isProviderAvailable("zai")) {
     options.push(buildConfig("zai", "glm-5-turbo"));
   }
-  if (primary.provider === "zai" && isProviderAvailable("gemini")) {
+  if (primary.provider !== "gemini" && isProviderAvailable("gemini")) {
     options.push(buildConfig("gemini", "gemini-flash-latest"));
+  }
+  if (primary.provider !== "openai" && isProviderAvailable("openai")) {
+    options.push(buildConfig("openai", "gpt-4o-mini"));
   }
 
   return options;
@@ -59,6 +61,9 @@ function buildConfig(provider: LLMProvider, model: string): LLMConfig {
   }
   if (provider === "gemini") {
     return { provider, model, apiKey: process.env.GEMINI_API_KEY || "", baseUrl: "https://generativelanguage.googleapis.com/v1beta" };
+  }
+  if (provider === "openai") {
+    return { provider, model, apiKey: process.env.OPENAI_API_KEY || "", baseUrl: "https://api.openai.com/v1" };
   }
   throw new Error(`Unknown provider: ${provider}`);
 }
