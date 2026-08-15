@@ -6,8 +6,8 @@
 import type { LLMConfig, LLMTask, LLMProvider } from "./types";
 
 const TASK_MODEL_MAP: Record<LLMTask, { provider: LLMProvider; model: string }> = {
-  core_decide:     { provider: "zai", model: "glm-5.2" },
-  core_integrate:  { provider: "zai", model: "glm-5.2" },
+  core_decide:     { provider: "zai", model: "glm-5-turbo" },
+  core_integrate:  { provider: "zai", model: "glm-5-turbo" },
   dev:             { provider: "zai", model: "glm-5.2" },
   design:          { provider: "zai", model: "glm-5.1" },
   analytics:       { provider: "zai", model: "glm-5.1" },
