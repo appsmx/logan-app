@@ -1,4 +1,4 @@
-// LOGAN OS middleware — protege el panel de administración + CORS para API pública.
+// LOGAN OS middleware — protege el panel de administración + CORS para API.
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
@@ -8,15 +8,15 @@ const PUBLIC_ROUTES = [
   "/login",
   "/api/login",
   "/api/showcase",
-  "/api/assistant/chat",
-  "/api/projects/", // Needed for update-vision endpoint (protected by its own secret)
+  "/api/assistant",
+  "/api/projects",
   "/api/usage",
   "/_next",
   "/favicon",
   "/logo",
 ];
 
-// Dominios permitidos para CORS (productos creados con LOGAN)
+// Dominios permitidos para CORS
 const ALLOWED_ORIGINS = [
   "https://mrtramite.mx",
   "https://www.mrtramite.mx",
@@ -38,7 +38,7 @@ function isAuthenticated(request: NextRequest): boolean {
 
 function getCorsHeaders(origin: string | null) {
   const headers: Record<string, string> = {
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Max-Age": "86400",
   };
@@ -46,7 +46,6 @@ function getCorsHeaders(origin: string | null) {
   if (origin && ALLOWED_ORIGINS.includes(origin)) {
     headers["Access-Control-Allow-Origin"] = origin;
   } else {
-    // Para cualquier otro origen, permitir (el endpoint es público)
     headers["Access-Control-Allow-Origin"] = "*";
   }
 
@@ -57,53 +56,57 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const origin = request.headers.get("origin");
 
-  // --- CORS preflight (OPTIONS) para rutas de API pública ---
-  if (request.method === "OPTIONS" && pathname.startsWith("/api/")) {
-    const corsHeaders = getCorsHeaders(origin);
-    return new NextResponse(null, {
-      status: 204,
-      headers: corsHeaders,
-    });
+  // --- ALL /api/ routes get CORS headers ---
+  if (pathname.startsWith("/api/")) {
+    // Preflight OPTIONS → respond immediately
+    if (request.method === "OPTIONS") {
+      return new NextResponse(null, {
+        status: 204,
+        headers: getCorsHeaders(origin),
+      });
+    }
+
+    // For actual requests to public API routes, add CORS headers and pass through
+    if (isPublicRoute(pathname)) {
+      const response = NextResponse.next();
+      const corsHeaders = getCorsHeaders(origin);
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+      return response;
+    }
+
+    // Non-public API routes: check auth, still add CORS if authenticated
+    if (isAuthenticated(request)) {
+      const response = NextResponse.next();
+      const corsHeaders = getCorsHeaders(origin);
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+      return response;
+    }
+
+    // Not authenticated, not public → 401
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  // --- Agregar CORS headers a respuestas de API pública ---
-  if (pathname.startsWith("/api/assistant/") || pathname.startsWith("/api/showcase/") || pathname.includes("/update-vision")) {
-    const authed = isAuthenticated(request);
-    
-    // Estas rutas son públicas, dejar pasar
-    const response = NextResponse.next();
-    const corsHeaders = getCorsHeaders(origin);
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      response.headers.set(key, value);
-    });
-    return response;
-  }
+  // --- Non-API routes: authentication logic ---
 
-  // --- Lógica de autenticación existente ---
-
-  // Raíz:
-  // - Si autenticado → dejar pasar a LOGAN OS
-  // - Si no autenticado → redirigir al showcase
   if (pathname === "/") {
-    const authed = isAuthenticated(request);
-    if (authed) {
+    if (isAuthenticated(request)) {
       return NextResponse.next();
     }
     return NextResponse.redirect(new URL("/showcase", request.url));
   }
 
-  // Rutas públicas → siempre dejar pasar
   if (isPublicRoute(pathname)) {
     return NextResponse.next();
   }
 
-  // Todo lo demás → verificar autenticación
-  const authed = isAuthenticated(request);
-  if (authed) {
+  if (isAuthenticated(request)) {
     return NextResponse.next();
   }
 
-  // No autenticado → redirigir al showcase
   return NextResponse.redirect(new URL("/showcase", request.url));
 }
 
