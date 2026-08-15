@@ -42,7 +42,7 @@ export function getLLMConfigWithFallback(task: LLMTask): LLMConfig[] {
 
   // Add fallback: if primary is zai, try gemini. If primary is gemini, try zai.
   if (primary.provider === "zai" && isProviderAvailable("gemini")) {
-    options.push(buildConfig("gemini", "gemini-2.0-flash"));
+    options.push(buildConfig("gemini", "gemini-flash-latest"));
   }
   if (primary.provider === "gemini" && isProviderAvailable("zai")) {
     options.push(buildConfig("zai", "glm-4.6"));
