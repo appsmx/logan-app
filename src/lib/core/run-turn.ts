@@ -196,6 +196,7 @@ export async function runCoreTurn(
   projectId: string,
   message: string,
   onProgress?: OnProgress,
+  history?: { role: string; content: string }[],
 ): Promise<CoreEndpointResult> {
   const emit = (event: CoreTurnProgress) => { try { onProgress?.(event); } catch { /* swallow */ } };
 
@@ -215,7 +216,7 @@ export async function runCoreTurn(
   emit({ stage: "thinking", message: "Pensando…" });
   let rawText: string;
   try {
-    const response = await callLLM({ task: "core_decide", systemPrompt, userMessage: message });
+    const response = await callLLM({ task: "core_decide", systemPrompt, userMessage: message, history });
     rawText = response.text;
     if (!rawText?.trim()) { console.error("[core] LLM vacío"); throw new CoreTurnError("unavailable", "LOGAN Core no disponible en este momento"); }
   } catch (e) {

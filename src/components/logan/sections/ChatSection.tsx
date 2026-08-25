@@ -143,6 +143,12 @@ export function ChatSection() {
         body: JSON.stringify({
           projectId: activeProjectId,
           message: trimmed,
+          history: messages
+            .filter((m) => !m.pending && m.text)
+            .map((m) => ({
+              role: m.role === "user" ? "user" : "assistant",
+              content: m.text,
+            })),
         }),
       });
 
