@@ -589,7 +589,7 @@ export type SidebarSection = {
   key: string;
   label: string;
   icon: string;
-  group: "MARCO" | "ECOSISTEMA" | "PROYECTO";
+  group: "MARCO" | "ECOSISTEMA" | "PROYECTO" | "ADMIN";
   requiresProject: boolean;
 };
 
@@ -615,6 +615,7 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
   { key: "finance", label: "Finance", icon: "Coins", group: "PROYECTO", requiresProject: true },
   { key: "legal", label: "Legal", icon: "Scale", group: "PROYECTO", requiresProject: true },
   { key: "support", label: "Support", icon: "LifeBuoy", group: "PROYECTO", requiresProject: true },
+  { key: "admin", label: "Admin POS", icon: "Building2", group: "ADMIN", requiresProject: false },
 ];
 
 // LML reference (kept for a small reference card).

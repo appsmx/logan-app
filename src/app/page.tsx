@@ -23,6 +23,7 @@ import { AnalyticsSection } from "@/components/logan/sections/AnalyticsSection";
 import { FinanceSection } from "@/components/logan/sections/FinanceSection";
 import { LegalSection } from "@/components/logan/sections/LegalSection";
 import { SupportSection } from "@/components/logan/sections/SupportSection";
+import { AdminSection } from "@/components/logan/sections/AdminSection";
 import { DecisionsSection } from "@/components/logan/sections/DecisionsSection";
 import { DiscoveriesSection } from "@/components/logan/sections/DiscoveriesSection";
 import { AuditSection } from "@/components/logan/sections/AuditSection";
@@ -52,6 +53,7 @@ const SECTIONS: Record<string, React.ComponentType> = {
   biblia: BibleSection,
   ciclo: CycleSection,
   sesion: SessionSection,
+  admin: AdminSection,
 };
 
 function PageInner() {
