@@ -36,7 +36,7 @@ import { runCoreTurn, CoreTurnError, type CoreTurnProgress } from "@/lib/core/ru
 // SSE streaming keeps the connection open during 3-LLM turns (25-30s typical).
 export const maxDuration = 60;
 
-type CoreRequestBody = { projectId?: string; message?: string };
+type CoreRequestBody = { projectId?: string; message?: string; history?: { role: string; content: string }[] };
 
 function sseEncode(event: string, data: unknown): string {
   const payload = typeof data === "string" ? data : JSON.stringify(data);
@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
 
   const projectId = (body.projectId || "").trim();
   const message = (body.message || "").trim();
+  const history = body.history || [];
 
   if (!projectId || !message) {
     const error = !projectId ? "Proyecto no encontrado" : "Mensaje vacío";
@@ -80,7 +81,7 @@ export async function POST(req: NextRequest) {
       };
 
       try {
-        const result = await runCoreTurn(projectId, message, onProgress);
+        const result = await runCoreTurn(projectId, message, onProgress, history);
         send("result", result);
       } catch (e) {
         if (e instanceof CoreTurnError) {
