@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const GROUPS: { key: "MARCO" | "ECOSISTEMA" | "PROYECTO"; label: string; hint: string }[] = [
+const GROUPS: { key: "MARCO" | "ECOSISTEMA" | "PROYECTO" | "ADMIN"; label: string; hint: string }[] = [
   { key: "MARCO", label: "MARCO", hint: "La visión, la constitución y el manual." },
   {
     key: "ECOSISTEMA",
@@ -23,6 +23,11 @@ const GROUPS: { key: "MARCO" | "ECOSISTEMA" | "PROYECTO"; label: string; hint: s
     key: "PROYECTO",
     label: "PROYECTO",
     hint: "La Biblia del proyecto activo.",
+  },
+  {
+    key: "ADMIN",
+    label: "ADMIN",
+    hint: "Gestión de negocios Logan POS.",
   },
 ];
 
