@@ -28,6 +28,7 @@ export function isProviderAvailable(provider: LLMProvider): boolean {
   if (provider === "zai") return !!process.env.ZAI_API_KEY;
   if (provider === "gemini") return !!process.env.GEMINI_API_KEY;
   if (provider === "openai") return !!process.env.OPENAI_API_KEY;
+  if (provider === "deepseek") return !!process.env.DEEPSEEK_API_KEY;
   return false;
 }
 
@@ -48,6 +49,9 @@ export function getLLMConfigWithFallback(task: LLMTask): LLMConfig[] {
   if (primary.provider !== "gemini" && isProviderAvailable("gemini")) {
     options.push(buildConfig("gemini", "gemini-flash-latest"));
   }
+  if (primary.provider !== "deepseek" && isProviderAvailable("deepseek")) {
+    options.push(buildConfig("deepseek", "deepseek-chat"));
+  }
   if (primary.provider !== "openai" && isProviderAvailable("openai")) {
     options.push(buildConfig("openai", "gpt-4o-mini"));
   }
@@ -64,6 +68,9 @@ function buildConfig(provider: LLMProvider, model: string): LLMConfig {
   }
   if (provider === "openai") {
     return { provider, model, apiKey: process.env.OPENAI_API_KEY || "", baseUrl: "https://api.openai.com/v1" };
+  }
+  if (provider === "deepseek") {
+    return { provider, model, apiKey: process.env.DEEPSEEK_API_KEY || "", baseUrl: "https://api.deepseek.com" };
   }
   throw new Error(`Unknown provider: ${provider}`);
 }
