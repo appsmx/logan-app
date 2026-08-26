@@ -36,10 +36,11 @@ export async function callLLM(request: LLMRequest): Promise<LLMResponse> {
       if (config.provider === "zai") {
         return await callZai(config, request);
       } else if (config.provider === "gemini") {
-      return await callGemini(config, request);
-    } else if (config.provider === "openai") {
-      return await callOpenAI(config, request);
         return await callGemini(config, request);
+      } else if (config.provider === "openai") {
+        return await callOpenAI(config, request);
+      } else if (config.provider === "deepseek") {
+        return await callDeepSeek(config, request);
       }
       errors.push(`[${config.provider}/${config.model}] unknown provider`);
     } catch (e) {
@@ -232,6 +233,65 @@ async function callOpenAI(config: LLMConfig, request: LLMRequest): Promise<LLMRe
   return {
     text,
     provider: "openai",
+    model: config.model,
+    usage: {
+      promptTokens: data.usage?.prompt_tokens || 0,
+      completionTokens: data.usage?.completion_tokens || 0,
+      totalTokens: data.usage?.total_tokens || 0,
+    },
+  };
+}
+
+
+
+// ─── DeepSeek (OpenAI-compatible format) ─────────────────────────────────────
+async function callDeepSeek(config: LLMConfig, request: LLMRequest): Promise<LLMResponse> {
+  const url = `${config.baseUrl}/chat/completions`;
+
+  const messages: LLMMessage[] = [
+    { role: "system", content: request.systemPrompt },
+  ];
+
+  if (request.history && request.history.length > 0) {
+    messages.push(...request.history);
+  }
+
+  messages.push({ role: "user", content: request.userMessage });
+
+  const body = {
+    model: config.model,
+    messages,
+    max_tokens: request.maxTokens || 8192,
+    temperature: request.temperature ?? 0.7,
+  };
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${config.apiKey}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const msg = err.error?.message || res.statusText;
+    const e = new Error(`DeepSeek API ${res.status}: ${msg}`);
+    (e as Error & { status?: number }).status = res.status;
+    throw e;
+  }
+
+  const data = await res.json();
+  const text = data.choices?.[0]?.message?.content || "";
+
+  if (!text.trim()) {
+    throw new Error("DeepSeek returned empty response");
+  }
+
+  return {
+    text,
+    provider: "deepseek",
     model: config.model,
     usage: {
       promptTokens: data.usage?.prompt_tokens || 0,
