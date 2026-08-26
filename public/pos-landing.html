@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logan POS — Tu negocio en piloto automático</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; background: #060918; }
+    
+    .mesh-gradient { background: radial-gradient(at 30% 10%, rgba(56,189,248,0.12) 0%, transparent 50%), radial-gradient(at 70% 90%, rgba(168,85,247,0.10) 0%, transparent 50%), radial-gradient(at 50% 50%, rgba(99,102,241,0.06) 0%, transparent 60%); }
+    .section-glow { background: radial-gradient(ellipse at 50% 0%, rgba(56,189,248,0.06) 0%, transparent 60%); }
+    .section-glow-purple { background: radial-gradient(ellipse at 50% 0%, rgba(168,85,247,0.06) 0%, transparent 60%); }
+    
+    .glass { background: rgba(255,255,255,0.04); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+    .glass-strong { background: rgba(255,255,255,0.06); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); }
+    .glass-bright { background: rgba(255,255,255,0.08); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); }
+    
+    .glow-sm { box-shadow: 0 0 40px rgba(56,189,248,0.12); }
+    .glow-purple { box-shadow: 0 0 50px rgba(168,85,247,0.15); }
+    .glow-green { box-shadow: 0 0 40px rgba(34,197,94,0.15); }
+    
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes gradient-shift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    @keyframes pulse-ring { 0%{transform:scale(1);opacity:1} 100%{transform:scale(1.5);opacity:0} }
+    @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+    
+    .float { animation: float 4s ease-in-out infinite; }
+    .float-delay { animation: float 4s ease-in-out 1.5s infinite; }
+    .gradient-text { background:linear-gradient(135deg,#38bdf8,#a855f7,#38bdf8); background-size:200% 200%; animation:gradient-shift 5s ease infinite; -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .pulse-ring::before { content:''; position:absolute; inset:-4px; border-radius:inherit; border:2px solid rgba(56,189,248,0.4); animation:pulse-ring 2s infinite; }
+    .demo-msg { opacity:0; transform:translateY(10px); transition: all 0.4s ease; }
+    .demo-msg.visible { opacity:1; transform:translateY(0); }
+    .tab-active { background: rgba(56,189,248,0.2) !important; color: #7dd3fc !important; border-color: rgba(56,189,248,0.3) !important; }
+    .tab-active-purple { background: rgba(168,85,247,0.2) !important; color: #c4b5fd !important; border-color: rgba(168,85,247,0.3) !important; }
+    
+    .shimmer { position:relative; overflow:hidden; }
+    .shimmer::after { content:''; position:absolute; top:0; left:0; width:50%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.03),transparent); animation:shimmer 3s infinite; }
+  </style>
+</head>
+<body class="text-white overflow-x-hidden">
+
+  <!-- HERO -->
+  <section class="min-h-screen mesh-gradient flex flex-col items-center justify-center px-6 text-center relative">
+    <div class="absolute top-1/4 left-[10%] w-72 h-72 bg-sky-400/8 rounded-full blur-3xl float"></div>
+    <div class="absolute bottom-1/3 right-[10%] w-80 h-80 bg-purple-400/8 rounded-full blur-3xl float-delay"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl"></div>
+    
+    <div class="relative z-10 max-w-3xl">
+      <div class="inline-flex items-center gap-2.5 glass-bright rounded-full px-5 py-2.5 text-sm text-gray-200 mb-10">
+        <span class="relative flex h-2.5 w-2.5">
+          <span class="absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75 animate-ping"></span>
+          <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-sky-400"></span>
+        </span>
+        Inteligencia artificial para negocios locales
+      </div>
+
+      <h1 class="text-5xl md:text-7xl font-black leading-[1.05] mb-6 tracking-tight">
+        Un profesional<br>
+        <span class="gradient-text">en tu bolsillo</span>
+      </h1>
+      
+      <p class="text-lg md:text-xl text-gray-300 max-w-xl mx-auto mb-12 leading-relaxed font-light">
+        Logan administra, analiza y protege tu negocio — mientras tú te enfocas en lo que importa. Desde tu celular.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="https://wa.me/5216441234567?text=Quiero%20Logan%20POS" target="_blank"
+           class="relative inline-flex items-center gap-3 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-[1.02] shadow-2xl shadow-sky-500/25 pulse-ring">
+          Comenzar ahora
+        </a>
+        <a href="#demo-ai" class="glass-bright hover:bg-white/10 text-gray-200 px-8 py-4 rounded-2xl text-lg font-medium transition-all">
+          Ver demostración ↓
+        </a>
+      </div>
+      
+      <div class="flex items-center justify-center gap-8 mt-14 text-sm text-gray-400">
+        <span>🏪 Negocios activos</span>
+        <span>⚡ Listo en 1 día</span>
+        <span>🔒 Sin contratos</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== AI DEMO SECTION ===== -->
+  <section id="demo-ai" class="py-32 px-6 relative section-glow-purple">
+    <div class="max-w-5xl mx-auto relative z-10">
+      <div class="text-center mb-16">
+        <p class="text-purple-400 text-sm font-medium tracking-widest uppercase mb-3">Tu asistente inteligente</p>
+        <h2 class="text-3xl md:text-5xl font-bold mb-4">Mira lo que Logan puede hacer por ti</h2>
+        <p class="text-gray-400 max-w-lg mx-auto">Selecciona un escenario — los datos son de ejemplo, con TU negocio serían los tuyos reales</p>
+      </div>
+      
+      <!-- AI Demo tabs -->
+      <div class="flex flex-wrap justify-center gap-2 mb-8" id="ai-tabs">
+        <button onclick="playAIDemo(0)" class="demo-tab-ai glass-bright px-4 py-2 rounded-full text-sm font-medium transition-all tab-active" data-tab="0">📊 Ventas hoy</button>
+        <button onclick="playAIDemo(1)" class="demo-tab-ai glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="1">📦 Inventario</button>
+        <button onclick="playAIDemo(2)" class="demo-tab-ai glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="2">💡 Recomendaciones</button>
+        <button onclick="playAIDemo(3)" class="demo-tab-ai glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="3">👥 Clientes VIP</button>
+        <button onclick="playAIDemo(4)" class="demo-tab-ai glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="4">📅 Día más flojo</button>
+        <button onclick="playAIDemo(5)" class="demo-tab-ai glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="5">🍽️ Menú inteligente</button>
+        <button onclick="playAIDemo(6)" class="demo-tab-ai glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="6">💰 Metas de venta</button>
+        <button onclick="playAIDemo(7)" class="demo-tab-ai glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="7">🚨 Alertas</button>
+      </div>
+      
+      <!-- AI Chat container -->
+      <div class="max-w-lg mx-auto glass-strong rounded-3xl overflow-hidden glow-purple shimmer">
+        <div class="bg-white/5 px-5 py-3.5 border-b border-white/5 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-sky-500 flex items-center justify-center text-sm font-bold">🤖</div>
+          <div>
+            <div class="text-sm font-semibold">Logan · Asistente IA</div>
+            <div class="text-[11px] text-green-400 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
+              Conectado a tu negocio
+            </div>
+          </div>
+          <div class="ml-auto text-[10px] text-gray-500 bg-white/5 px-2 py-1 rounded-full">En vivo</div>
+        </div>
+        <div id="ai-chat" class="p-5 space-y-4 min-h-[300px] max-h-[400px] overflow-y-auto"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== POS FEATURES DEMO ===== -->
+  <section id="demo-pos" class="py-32 px-6 relative section-glow">
+    <div class="max-w-5xl mx-auto relative z-10">
+      <div class="text-center mb-16">
+        <p class="text-sky-400 text-sm font-medium tracking-widest uppercase mb-3">El sistema completo</p>
+        <h2 class="text-3xl md:text-5xl font-bold mb-4">Todo lo que necesitas, en un solo lugar</h2>
+        <p class="text-gray-400 max-w-lg mx-auto">Cada sección diseñada para que sea intuitiva — como usar WhatsApp</p>
+      </div>
+      
+      <!-- POS Feature tabs -->
+      <div class="flex flex-wrap justify-center gap-2 mb-8" id="pos-tabs">
+        <button onclick="showPOSFeature(0)" class="demo-tab-pos glass-bright px-4 py-2 rounded-full text-sm font-medium transition-all tab-active" data-tab="0">🏗️ Mesas</button>
+        <button onclick="showPOSFeature(1)" class="demo-tab-pos glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="1">🧾 Órdenes</button>
+        <button onclick="showPOSFeature(2)" class="demo-tab-pos glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="2">👨‍🍳 Cocina</button>
+        <button onclick="showPOSFeature(3)" class="demo-tab-pos glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="3">💰 Caja</button>
+        <button onclick="showPOSFeature(4)" class="demo-tab-pos glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="4">📊 Dashboard</button>
+        <button onclick="showPOSFeature(5)" class="demo-tab-pos glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="5">📦 Inventario</button>
+        <button onclick="showPOSFeature(6)" class="demo-tab-pos glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="6">👥 Clientes</button>
+        <button onclick="showPOSFeature(7)" class="demo-tab-pos glass px-4 py-2 rounded-full text-sm font-medium transition-all" data-tab="7">📅 Citas</button>
+      </div>
+
+      <!-- POS Feature display -->
+      <div class="max-w-2xl mx-auto glass-strong rounded-3xl overflow-hidden glow-sm">
+        <div id="pos-feature" class="p-8 min-h-[320px] transition-all"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 STEPS -->
+  <section class="py-32 px-6">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-20">
+        <p class="text-sky-400 text-sm font-medium tracking-widest uppercase mb-3">Así de fácil</p>
+        <h2 class="text-3xl md:text-5xl font-bold">Tres toques y listo</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="glass-strong rounded-3xl p-8 text-center relative group hover:border-sky-500/20 transition-all">
+          <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-gradient-to-br from-sky-400 to-blue-500 rounded-full flex items-center justify-center text-sm font-bold shadow-lg shadow-sky-500/30">1</div>
+          <div class="text-5xl mb-5 mt-2">📱</div>
+          <h3 class="font-bold text-lg mb-2">Abre en tu cel o tablet</h3>
+          <p class="text-sm text-gray-400">Sin instalar apps. Abre el link y funciona.</p>
+        </div>
+        <div class="glass-strong rounded-3xl p-8 text-center relative group hover:border-purple-500/20 transition-all">
+          <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full flex items-center justify-center text-sm font-bold shadow-lg shadow-purple-500/30">2</div>
+          <div class="text-5xl mb-5 mt-2">💳</div>
+          <h3 class="font-bold text-lg mb-2">Cobra y registra</h3>
+          <p class="text-sm text-gray-400">Cada venta queda guardada automáticamente.</p>
+        </div>
+        <div class="glass-strong rounded-3xl p-8 text-center relative group hover:border-green-500/20 transition-all">
+          <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-sm font-bold shadow-lg shadow-green-500/30">3</div>
+          <div class="text-5xl mb-5 mt-2">🧠</div>
+          <h3 class="font-bold text-lg mb-2">Logan piensa por ti</h3>
+          <p class="text-sm text-gray-400">Te dice qué funciona y qué mejorar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section class="py-32 px-6 relative section-glow">
+    <div class="max-w-4xl mx-auto relative z-10">
+      <div class="text-center mb-16">
+        <p class="text-sky-400 text-sm font-medium tracking-widest uppercase mb-3">Compara</p>
+        <h2 class="text-3xl md:text-4xl font-bold">Logan vs lo que usas hoy</h2>
+      </div>
+      <div class="glass-strong rounded-3xl overflow-hidden">
+        <table class="w-full text-sm">
+          <thead><tr class="border-b border-white/5"><th class="text-left p-5 text-gray-400 font-normal"></th><th class="p-5 text-gray-500 font-normal">Libreta</th><th class="p-5 text-gray-500 font-normal">Otro POS</th><th class="p-5 font-bold text-sky-400">Logan</th></tr></thead>
+          <tbody class="text-center">
+            <tr class="border-b border-white/5"><td class="text-left p-4 text-gray-300">Ventas en tiempo real</td><td class="p-4 text-red-400">✗</td><td class="p-4 text-yellow-400">~</td><td class="p-4 text-green-400 font-bold">✓</td></tr>
+            <tr class="border-b border-white/5"><td class="text-left p-4 text-gray-300">Desde tu celular</td><td class="p-4 text-red-400">✗</td><td class="p-4 text-yellow-400">~</td><td class="p-4 text-green-400 font-bold">✓</td></tr>
+            <tr class="border-b border-white/5"><td class="text-left p-4 text-gray-300">Asistente IA</td><td class="p-4 text-red-400">✗</td><td class="p-4 text-red-400">✗</td><td class="p-4 text-green-400 font-bold">✓</td></tr>
+            <tr class="border-b border-white/5"><td class="text-left p-4 text-gray-300">Detecta robos</td><td class="p-4 text-red-400">✗</td><td class="p-4 text-yellow-400">~</td><td class="p-4 text-green-400 font-bold">✓</td></tr>
+            <tr class="border-b border-white/5"><td class="text-left p-4 text-gray-300">Sin contratos</td><td class="p-4 text-green-400">✓</td><td class="p-4 text-red-400">✗</td><td class="p-4 text-green-400 font-bold">✓</td></tr>
+            <tr><td class="text-left p-4 text-gray-300">Precio</td><td class="p-4 text-gray-400">$0</td><td class="p-4 text-gray-400">$800-3,000</td><td class="p-4 text-sky-400 font-bold">Desde $500</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUSINESS TYPES -->
+  <section class="py-32 px-6">
+    <div class="max-w-5xl mx-auto text-center">
+      <p class="text-sky-400 text-sm font-medium tracking-widest uppercase mb-3">Adaptable</p>
+      <h2 class="text-3xl md:text-5xl font-bold mb-16">Se adapta a lo que tú haces</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="glass-bright rounded-2xl p-6 hover:bg-white/8 transition-all group cursor-default"><div class="text-4xl mb-3 group-hover:scale-110 transition-transform">🍽️</div><div class="font-semibold text-sm">Restaurante</div><div class="text-xs text-gray-400 mt-1">Mesas · Cocina · Menú QR</div></div>
+        <div class="glass-bright rounded-2xl p-6 hover:bg-white/8 transition-all group cursor-default"><div class="text-4xl mb-3 group-hover:scale-110 transition-transform">💈</div><div class="font-semibold text-sm">Barbería</div><div class="text-xs text-gray-400 mt-1">Citas · Turnos · Lealtad</div></div>
+        <div class="glass-bright rounded-2xl p-6 hover:bg-white/8 transition-all group cursor-default"><div class="text-4xl mb-3 group-hover:scale-110 transition-transform">☕</div><div class="font-semibold text-sm">Cafetería</div><div class="text-xs text-gray-400 mt-1">Barra · Pedidos · Lealtad</div></div>
+        <div class="glass-bright rounded-2xl p-6 hover:bg-white/8 transition-all group cursor-default"><div class="text-4xl mb-3 group-hover:scale-110 transition-transform">🏪</div><div class="font-semibold text-sm">Tienda</div><div class="text-xs text-gray-400 mt-1">Stock · Alertas · Ventas</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="planes" class="py-32 px-6 relative section-glow-purple">
+    <div class="max-w-4xl mx-auto relative z-10 text-center">
+      <p class="text-sky-400 text-sm font-medium tracking-widest uppercase mb-3">Inversión</p>
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">Menos que un empleado. <span class="text-sky-300">Más que un contador.</span></h2>
+      <p class="text-gray-400 mb-16">Logan trabaja 24/7 por una fracción de lo que pagarías por un humano.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
+        <div class="glass-bright rounded-3xl p-7 hover:border-white/15 transition-all"><div class="text-xs text-gray-400 tracking-wider uppercase mb-2">Starter</div><div class="text-4xl font-black">$500<span class="text-base font-normal text-gray-500">/mes</span></div><div class="text-xs text-gray-500 mt-1 mb-6">Setup: $3,000</div><ul class="text-sm text-gray-400 space-y-2.5"><li class="flex gap-2"><span class="text-sky-400">→</span> Cobros y registro</li><li class="flex gap-2"><span class="text-sky-400">→</span> Reportes del día</li><li class="flex gap-2"><span class="text-sky-400">→</span> Caja registradora</li><li class="flex gap-2"><span class="text-sky-400">→</span> 3 empleados</li></ul></div>
+        <div class="glass-strong rounded-3xl p-7 border-sky-500/30 glow-sm relative"><div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-sky-500 to-blue-500 text-[11px] font-bold px-3 py-1 rounded-full shadow-lg shadow-sky-500/30">POPULAR</div><div class="text-xs text-sky-400 tracking-wider uppercase mb-2">Growth</div><div class="text-4xl font-black">$1,000<span class="text-base font-normal text-gray-500">/mes</span></div><div class="text-xs text-gray-500 mt-1 mb-6">Setup: $4,000</div><ul class="text-sm text-gray-200 space-y-2.5"><li class="flex gap-2"><span class="text-sky-400">→</span> Todo de Starter</li><li class="flex gap-2"><span class="text-sky-400">→</span> Inventario + alertas</li><li class="flex gap-2"><span class="text-sky-400">→</span> Clientes + lealtad</li><li class="flex gap-2"><span class="text-sky-400">→</span> Empleados ilimitados</li><li class="flex gap-2"><span class="text-sky-400">→</span> Menú digital QR</li></ul></div>
+        <div class="glass-bright rounded-3xl p-7 hover:border-purple-500/20 transition-all"><div class="text-xs text-purple-400 tracking-wider uppercase mb-2">Pro</div><div class="text-4xl font-black">$1,500<span class="text-base font-normal text-gray-500">/mes</span></div><div class="text-xs text-gray-500 mt-1 mb-6">Setup: $5,000</div><ul class="text-sm text-gray-400 space-y-2.5"><li class="flex gap-2"><span class="text-purple-400">→</span> Todo de Growth</li><li class="flex gap-2"><span class="text-purple-400">→</span> 🤖 Asistente IA</li><li class="flex gap-2"><span class="text-purple-400">→</span> Recetas y costeo</li><li class="flex gap-2"><span class="text-purple-400">→</span> Soporte prioritario</li><li class="flex gap-2"><span class="text-purple-400">→</span> Importador de datos</li></ul></div>
+      </div>
+      <p class="text-xs text-gray-500 mt-10">Sin contratos. Cancela cuando quieras. Tus datos siempre son tuyos.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="py-32 px-6">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-center mb-16"><h2 class="text-3xl font-bold">Preguntas frecuentes</h2></div>
+      <div class="space-y-3">
+        <details class="glass-bright rounded-2xl group"><summary class="p-5 cursor-pointer font-medium flex items-center justify-between text-gray-200">¿Necesito equipo especial?<span class="text-gray-400 group-open:rotate-45 transition-transform text-xl">+</span></summary><div class="px-5 pb-5 text-sm text-gray-400">No. Funciona en cualquier tablet, celular o computadora con internet.</div></details>
+        <details class="glass-bright rounded-2xl group"><summary class="p-5 cursor-pointer font-medium flex items-center justify-between text-gray-200">¿Qué pasa si se va el internet?<span class="text-gray-400 group-open:rotate-45 transition-transform text-xl">+</span></summary><div class="px-5 pb-5 text-sm text-gray-400">Puedes seguir registrando ventas offline. Se sincronizan cuando vuelve la conexión.</div></details>
+        <details class="glass-bright rounded-2xl group"><summary class="p-5 cursor-pointer font-medium flex items-center justify-between text-gray-200">¿Puedo cancelar cuando quiera?<span class="text-gray-400 group-open:rotate-45 transition-transform text-xl">+</span></summary><div class="px-5 pb-5 text-sm text-gray-400">Sí. Sin contrato, sin penalización. Te llevas tus datos gratis.</div></details>
+        <details class="glass-bright rounded-2xl group"><summary class="p-5 cursor-pointer font-medium flex items-center justify-between text-gray-200">¿Ya tengo otro sistema — puedo migrar?<span class="text-gray-400 group-open:rotate-45 transition-transform text-xl">+</span></summary><div class="px-5 pb-5 text-sm text-gray-400">Sí. Importamos datos de Loyverse, Excel y otros. Incluido en el setup.</div></details>
+        <details class="glass-bright rounded-2xl group"><summary class="p-5 cursor-pointer font-medium flex items-center justify-between text-gray-200">¿El asistente IA cuesta extra?<span class="text-gray-400 group-open:rotate-45 transition-transform text-xl">+</span></summary><div class="px-5 pb-5 text-sm text-gray-400">Incluido en el plan Pro. Sin límite de preguntas.</div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="py-32 px-6 text-center">
+    <div class="max-w-2xl mx-auto">
+      <h2 class="text-3xl md:text-5xl font-bold mb-6">El futuro de tu negocio<br>empieza con un mensaje</h2>
+      <p class="text-gray-300 mb-10 text-lg">Te activamos hoy. Mañana ya tienes el control total.</p>
+      <a href="https://wa.me/5216441234567?text=Hola%2C%20quiero%20Logan%20POS" target="_blank" class="inline-flex items-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white px-10 py-5 rounded-2xl text-xl font-bold transition-all hover:scale-[1.02] shadow-2xl shadow-green-500/25 glow-green">
+        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Activar mi Logan POS
+      </a>
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div><div class="text-2xl font-black text-sky-400">24/7</div><div class="text-xs text-gray-500 mt-1">Siempre activo</div></div>
+        <div><div class="text-2xl font-black text-sky-400">1 día</div><div class="text-xs text-gray-500 mt-1">Para activarlo</div></div>
+        <div><div class="text-2xl font-black text-sky-400">$0</div><div class="text-xs text-gray-500 mt-1">Costo de salida</div></div>
+        <div><div class="text-2xl font-black text-sky-400">∞</div><div class="text-xs text-gray-500 mt-1">Actualizaciones</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="py-8 px-6 border-t border-white/5">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2.5"><div class="w-8 h-8 bg-gradient-to-br from-sky-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">L</div><span class="font-bold tracking-tight">Logan POS</span></div>
+      <p class="text-xs text-gray-600">© 2026 Logan Corp · Tecnología para negocios locales</p>
+    </div>
+  </footer>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // ===== AI DEMO DATA =====
+    const aiDemos = [
+      [ { role:'user', text:'¿Cómo van las ventas hoy?' },
+        { role:'ai', text:'📊 <strong>Hoy llevas $4,200 en 12 órdenes</strong><br><br>• Ticket promedio: <strong>$350</strong><br>• Producto estrella: Coctel de Camarón (5)<br>• <span class="text-green-400">↑ 15%</span> vs el lunes pasado<br><br>💡 Si mantienes el ritmo, cierras arriba de $7,000.' } ],
+      [ { role:'user', text:'¿Tengo algo bajo en inventario?' },
+        { role:'ai', text:'⚠️ <strong>3 ingredientes en alerta:</strong><br><br>• 🦐 Camarón: <strong class="text-red-400">2 kg</strong> (~8 platillos)<br>• 🥑 Aguacate: <strong class="text-yellow-400">5 pzas</strong><br>• 🍋 Limón: <strong class="text-yellow-400">1 bolsa</strong><br><br>📞 Pide hoy antes de las 2pm para mañana temprano.' } ],
+      [ { role:'user', text:'¿Qué me recomiendas para vender más?' },
+        { role:'ai', text:'💡 <strong>3 recomendaciones:</strong><br><br>1. El <strong>Aguachile</strong> subió 40% — ponlo como "Recomendado" en el menú QR<br><br>2. Los <strong>martes</strong> son tu día flojo ($1,800). ¿2x1 en bebidas?<br><br>3. <strong>Roberto M.</strong> dejó de venir hace 3 semanas. ¿Le mandamos un descuento?' } ],
+      [ { role:'user', text:'¿Quiénes son mis mejores clientes?' },
+        { role:'ai', text:'👑 <strong>Top 5 del mes:</strong><br><br>1. Roberto Méndez — 8 visitas, $4,200<br>2. María López — 6 visitas, $3,100<br>3. Carlos Ruiz — 5 visitas, $2,800<br>4. Ana García — 4 visitas, $2,200<br>5. Pedro Soto — 4 visitas, $1,900<br><br>💡 Roberto no ha venido en 3 semanas.' } ],
+      [ { role:'user', text:'¿Cuál es mi día más flojo?' },
+        { role:'ai', text:'📅 <strong>Análisis por día de la semana:</strong><br><br>🟢 Viernes: $6,200 (mejor)<br>🟢 Sábado: $5,800<br>🟡 Domingo: $4,100<br>🟡 Jueves: $3,900<br>🟡 Miércoles: $3,400<br>🟡 Lunes: $3,200<br>🔴 Martes: $1,800 (peor)<br><br>💡 El martes vendes 71% menos que el viernes. Una promo podría equilibrarlo.' } ],
+      [ { role:'user', text:'¿Qué debería quitar del menú?' },
+        { role:'ai', text:'🍽️ <strong>3 platillos que casi no se venden:</strong><br><br>1. Caldo de Res — 2 ventas en 30 días<br>2. Ensalada César — 4 ventas<br>3. Tostada de Pulpo — 5 ventas<br><br>💡 Quitar el Caldo libera ingredientes para el Aguachile (que sube cada semana). La Ensalada ocupa espacio sin rotar.' } ],
+      [ { role:'user', text:'¿Voy a llegar a mi meta de $30,000 esta semana?' },
+        { role:'ai', text:'🎯 <strong>Progreso semanal:</strong><br><br>Meta: $30,000<br>Acumulado (Lun-Jue): $14,600<br>Restante: $15,400<br><br>📊 Necesitas ~$5,130/día el Vie-Dom.<br>Tu promedio Vie-Dom es $5,370.<br><br>✅ <strong>Sí vas a llegar</strong> si mantienes el ritmo. El viernes es tu día fuerte — aprovéchalo.' } ],
+      [ { role:'user', text:'¿Hay algo raro hoy que deba saber?' },
+        { role:'ai', text:'🚨 <strong>2 alertas:</strong><br><br>1. ⚠️ La caja tiene <strong>$800 más</strong> de lo esperado según las ventas registradas. Posible error en un cobro o faltó registrar un gasto.<br><br>2. 📉 El mesero <strong>Luis</strong> lleva 0 órdenes en 2 horas (normalmente lleva 4-5 a esta hora).<br><br>💡 Te recomiendo revisar la caja y verificar si Luis está bien.' } ],
+    ];
+
+    // ===== POS FEATURES DATA =====
+    const posFeatures = [
+      { icon:'🏗️', title:'Mesas y Plano', desc:'Ve de un vistazo cuáles están ocupadas, disponibles o por limpiar. Arrastra para reorganizar.', tips:['Toca una mesa para abrir su orden','Verde = disponible, Rojo = ocupada','Configura secciones: Terraza, Interior, Barra'] },
+      { icon:'🧾', title:'Órdenes en Tiempo Real', desc:'Cada pedido se registra al instante. Tu cocina lo ve, tu barra lo ve, tú lo ves.', tips:['Agrega productos con un toque','Notas especiales por platillo ("sin cebolla")','Divide la cuenta entre comensales'] },
+      { icon:'👨‍🍳', title:'Pantalla de Cocina', desc:'El cocinero ve qué preparar sin gritos ni papelitos. Marca "Listo" y el mesero se entera.', tips:['Prioridad automática por tiempo de espera','Separado por categoría (comida vs bebidas)','Timer por platillo — nunca olvidas una orden'] },
+      { icon:'💰', title:'Caja Registradora', desc:'Abre turno, registra ventas, retiros y depósitos. Al cerrar, sabes exactamente cuánto debe haber.', tips:['Apertura con monto inicial','Cierre con cuadre automático','Historial de quién abrió/cerró cada día'] },
+      { icon:'📊', title:'Dashboard de Ventas', desc:'Gráficas claras: hoy, semana, mes. Compara periodos. Identifica tendencias.', tips:['Ventas por hora — encuentra tu hora pico','Comparativa vs semana pasada','Ticket promedio y productos más vendidos'] },
+      { icon:'📦', title:'Inventario Inteligente', desc:'Controla stock de ingredientes. Logan te avisa cuando algo está por acabarse.', tips:['Descuento automático al vender (por receta)','Alertas de stock mínimo','Historial de compras y merma'] },
+      { icon:'👥', title:'Clientes y Lealtad', desc:'Registra a tus clientes, sus visitas, cuánto gastan. Premia su lealtad.', tips:['Puntos por compra automáticos','Cumpleaños — manda felicitación + promo','Identifica quién dejó de venir'] },
+      { icon:'📅', title:'Citas y Agenda', desc:'Para barberías y servicios — agenda citas, asigna turnos, evita traslapes.', tips:['Cliente reserva desde WhatsApp','Recordatorio automático 1 hora antes','Vista de agenda por barbero/estilista'] },
+    ];
+
+    let currentAIDemo = -1;
+    let currentPOSFeature = -1;
+
+    function playAIDemo(index) {
+      if (index === currentAIDemo) return;
+      currentAIDemo = index;
+      document.querySelectorAll('.demo-tab-ai').forEach((t,i) => { t.classList.toggle('tab-active', i===index); });
+      const chat = document.getElementById('ai-chat');
+      chat.innerHTML = '';
+      aiDemos[index].forEach((msg,i) => {
+        setTimeout(() => {
+          const div = document.createElement('div');
+          div.className = `flex ${msg.role==='user'?'justify-end':'justify-start'} demo-msg`;
+          div.innerHTML = `<div class="${msg.role==='user'?'bg-sky-600/80 backdrop-blur rounded-2xl rounded-br-md':'glass rounded-2xl rounded-bl-md'} px-4 py-3 text-sm max-w-[85%] ${msg.role==='ai'?'text-gray-200 leading-relaxed':''}">${msg.text}</div>`;
+          chat.appendChild(div);
+          setTimeout(() => div.classList.add('visible'), 50);
+          chat.scrollTop = chat.scrollHeight;
+        }, i * 1000);
+      });
+    }
+
+    function showPOSFeature(index) {
+      if (index === currentPOSFeature) return;
+      currentPOSFeature = index;
+      document.querySelectorAll('.demo-tab-pos').forEach((t,i) => { t.classList.toggle('tab-active', i===index); });
+      const el = document.getElementById('pos-feature');
+      const f = posFeatures[index];
+      el.style.opacity = '0';
+      setTimeout(() => {
+        el.innerHTML = `
+          <div class="text-center mb-6">
+            <div class="text-5xl mb-3">${f.icon}</div>
+            <h3 class="text-xl font-bold">${f.title}</h3>
+            <p class="text-sm text-gray-400 mt-2 max-w-md mx-auto">${f.desc}</p>
+          </div>
+          <div class="space-y-3">
+            <p class="text-xs text-sky-400 font-medium tracking-wider uppercase">Tips de uso:</p>
+            ${f.tips.map(t => `<div class="flex items-start gap-3 text-sm text-gray-300"><span class="text-sky-400 mt-0.5">→</span>${t}</div>`).join('')}
+          </div>
+        `;
+        el.style.opacity = '1';
+      }, 200);
+      el.style.transition = 'opacity 0.3s ease';
+    }
+
+    // Init
+    setTimeout(() => playAIDemo(0), 500);
+    showPOSFeature(0);
+    
+    // Auto-rotate AI demos
+    setInterval(() => { playAIDemo((currentAIDemo + 1) % aiDemos.length); }, 9000);
+  </script>
+
+</body>
+</html>
