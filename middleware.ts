@@ -12,6 +12,7 @@ const PUBLIC_ROUTES = [
   "/api/assistant",
   "/api/projects",
   "/api/usage",
+  "/api/llm",
   "/_next",
   "/favicon",
   "/logo",
