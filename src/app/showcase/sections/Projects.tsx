@@ -22,7 +22,7 @@ const PROJECTS: Project[] = [
     category: "Gestión de trámites",
     description:
       "Plataforma para gestionar trámites con seguimiento de orden, pagos y notificaciones. LOGAN trabaja su marketing y desarrollo de forma continua.",
-    href: "https://mrtramite.vercel.app",
+    href: "https://mrtramite.mx",
     hrefLabel: "Ver proyecto",
     status: "live",
     emoji: "📋",

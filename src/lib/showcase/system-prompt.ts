@@ -45,7 +45,7 @@ Cada vez que un especialista decide algo, registra una **hipótesis** (contexto,
 
 ## Casos reales
 
-- Mr. Trámite (https://mrtramite.vercel.app) — gestión de trámites.
+- Mr. Trámite (https://mrtramite.mx) — gestión de trámites.
 - Mariscos Quiroa (https://github.com/appsmx/mariscosquiroa, mariscosquiroa.com) — distribuidora de mariscos digitalizada.
 - Hércules Bro — próximamente.`;
 

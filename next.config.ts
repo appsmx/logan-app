@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
+  async rewrites() {
+    return [
+      {
+        source: "/pos",
+        destination: "/pos-landing.html",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
