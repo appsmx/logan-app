@@ -11,8 +11,8 @@ const EMAIL_URL = "mailto:hola@logancorp.mx";
 const FOOTER_LINKS = [
   {
     label: "Constitución",
-    href: "https://github.com/appsmx/logan",
-    external: true,
+    href: "/showcase",
+    external: false,
     icon: BookOpen,
   },
   {
@@ -22,9 +22,9 @@ const FOOTER_LINKS = [
     icon: Waypoints,
   },
   {
-    label: "GitHub",
-    href: "https://github.com/appsmx/logan",
-    external: true,
+    label: "Logan POS",
+    href: "/pos",
+    external: false,
     icon: Github,
   },
 ];
