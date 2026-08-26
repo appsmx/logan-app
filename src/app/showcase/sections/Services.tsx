@@ -3,7 +3,7 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 import {
-  Megaphone, Code2, Store, Gauge, Target, MessageCircle,
+  Megaphone, Code2, Store, Gauge, Target, MessageCircle, ShoppingCart,
   type LucideIcon,
 } from "lucide-react";
 
@@ -13,9 +13,21 @@ type Service = {
   description: string;
   icon: LucideIcon;
   bullets: string[];
+  link?: string;
+  highlight?: boolean;
 };
 
 const SERVICES: Service[] = [
+  {
+    id: "pos",
+    title: "Logan POS",
+    description:
+      "Punto de venta inteligente con IA integrada. Se adapta a restaurantes, barberías, cafeterías y tiendas. Cobra, controla y analiza tu negocio desde tu celular.",
+    icon: ShoppingCart,
+    bullets: ["Ventas", "IA", "Inventario", "Multi-negocio"],
+    link: "/pos",
+    highlight: true,
+  },
   {
     id: "marketing",
     title: "Marketing efectivo",
@@ -102,6 +114,8 @@ export function Services() {
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {SERVICES.map((s, i) => {
             const Icon = s.icon;
+            const CardWrapper = s.link ? 'a' : 'div';
+            const cardProps = s.link ? { href: s.link } : {};
             return (
               <motion.article
                 key={s.id}
@@ -109,20 +123,26 @@ export function Services() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.45, delay: (i % 3) * 0.08 }}
-                className="sc-glass sc-glass-hover group relative overflow-hidden rounded-2xl p-5 sm:p-6"
+                className={`sc-glass sc-glass-hover group relative overflow-hidden rounded-2xl p-5 sm:p-6 ${s.highlight ? 'ring-1 ring-sky-500/30' : ''}`}
               >
+                {s.link && (
+                  <a href={s.link} className="absolute inset-0 z-10" aria-label={`Ver ${s.title}`} />
+                )}
                 {/* Hover gradient overlay */}
                 <div
                   aria-hidden
                   className="pointer-events-none absolute -right-12 -top-12 size-32 rounded-full bg-[radial-gradient(circle,oklch(0.78_0.16_65/0.18)_0%,transparent_70%)] opacity-0 transition-opacity group-hover:opacity-100"
                 />
                 <div className="relative flex items-center gap-3">
-                  <div className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-[oklch(0.78_0.16_65/0.18)] to-[oklch(0.55_0.14_35/0.10)] text-[oklch(0.85_0.16_65)] ring-1 ring-[oklch(0.78_0.16_65/0.35)]">
+                  <div className={`flex size-11 items-center justify-center rounded-xl ${s.highlight ? 'bg-gradient-to-br from-sky-500/20 to-blue-600/10 text-sky-400 ring-1 ring-sky-500/40' : 'bg-gradient-to-br from-[oklch(0.78_0.16_65/0.18)] to-[oklch(0.55_0.14_35/0.10)] text-[oklch(0.85_0.16_65)] ring-1 ring-[oklch(0.78_0.16_65/0.35)]'}`}>
                     <Icon className="size-5" />
                   </div>
                   <h3 className="font-serif text-lg text-[oklch(0.93_0.012_75)]">
                     {s.title}
                   </h3>
+                  {s.highlight && (
+                    <span className="ml-auto text-[10px] bg-sky-500/20 text-sky-300 px-2 py-0.5 rounded-full font-medium">Nuevo</span>
+                  )}
                 </div>
                 <p className="mt-4 text-sm leading-relaxed text-[oklch(0.78_0.012_72)]">
                   {s.description}
@@ -137,6 +157,11 @@ export function Services() {
                     </li>
                   ))}
                 </ul>
+                {s.link && (
+                  <p className="mt-3 text-xs text-sky-400 group-hover:text-sky-300 transition-colors">
+                    Ver más →
+                  </p>
+                )}
               </motion.article>
             );
           })}
