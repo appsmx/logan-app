@@ -15,7 +15,7 @@ const TASK_MODEL_MAP: Record<LLMTask, { provider: LLMProvider; model: string }> 
   marketing:       { provider: "gemini", model: "gemini-flash-latest" },
   finance:         { provider: "gemini", model: "gemini-flash-latest" },
   support:         { provider: "gemini", model: "gemini-flash-latest" },
-  assistant:       { provider: "gemini", model: "gemini-flash-latest" },
+  assistant:       { provider: "deepseek", model: "deepseek-chat" },
   showcase:        { provider: "gemini", model: "gemini-flash-latest" },
 };
 
