@@ -1,22 +1,26 @@
-// LLM configuration: 3 providers with fallback chain.
-// Z.ai (primario) → Gemini (secundario) → OpenAI (terciario).
+// LLM configuration: 4 providers with fallback chain.
+// DeepSeek primario (más barato) → Z.ai → Gemini → OpenAI.
 // DEC-LOGAN-006: independence del proveedor.
 
 import type { LLMConfig, LLMTask, LLMProvider } from "./types";
 
+// DeepSeek como primario (muy barato, buena calidad)
+// Z.ai como secundario (GLM-5.2 para Dev — mejor código)
+// Gemini como terciario (gratis)
+// OpenAI como último recurso
 const TASK_MODEL_MAP: Record<LLMTask, { provider: LLMProvider; model: string }> = {
-  core_decide:     { provider: "zai", model: "glm-5-turbo" },
-  core_integrate:  { provider: "zai", model: "glm-5-turbo" },
+  core_decide:     { provider: "deepseek", model: "deepseek-chat" },
+  core_integrate:  { provider: "deepseek", model: "deepseek-chat" },
   dev:             { provider: "zai", model: "glm-5.2" },
-  design:          { provider: "gemini", model: "gemini-flash-latest" },
-  analytics:       { provider: "gemini", model: "gemini-flash-latest" },
-  legal:           { provider: "gemini", model: "gemini-flash-latest" },
-  validator:       { provider: "gemini", model: "gemini-flash-latest" },
-  marketing:       { provider: "gemini", model: "gemini-flash-latest" },
-  finance:         { provider: "gemini", model: "gemini-flash-latest" },
-  support:         { provider: "gemini", model: "gemini-flash-latest" },
+  design:          { provider: "deepseek", model: "deepseek-chat" },
+  analytics:       { provider: "deepseek", model: "deepseek-chat" },
+  legal:           { provider: "deepseek", model: "deepseek-chat" },
+  validator:       { provider: "deepseek", model: "deepseek-chat" },
+  marketing:       { provider: "deepseek", model: "deepseek-chat" },
+  finance:         { provider: "deepseek", model: "deepseek-chat" },
+  support:         { provider: "deepseek", model: "deepseek-chat" },
   assistant:       { provider: "deepseek", model: "deepseek-chat" },
-  showcase:        { provider: "gemini", model: "gemini-flash-latest" },
+  showcase:        { provider: "deepseek", model: "deepseek-chat" },
 };
 
 export function getLLMConfig(task: LLMTask): LLMConfig {
@@ -25,15 +29,14 @@ export function getLLMConfig(task: LLMTask): LLMConfig {
 }
 
 export function isProviderAvailable(provider: LLMProvider): boolean {
+  if (provider === "deepseek") return !!process.env.DEEPSEEK_API_KEY;
   if (provider === "zai") return !!process.env.ZAI_API_KEY;
   if (provider === "gemini") return !!process.env.GEMINI_API_KEY;
   if (provider === "openai") return !!process.env.OPENAI_API_KEY;
-  if (provider === "deepseek") return !!process.env.DEEPSEEK_API_KEY;
   return false;
 }
 
-// Returns an ARRAY of options for the fallback chain.
-// Order: primary → secondary → tertiary
+// Fallback chain: DeepSeek → Z.ai → Gemini → OpenAI
 export function getLLMConfigWithFallback(task: LLMTask): LLMConfig[] {
   const primary = getLLMConfig(task);
   const options: LLMConfig[] = [];
@@ -42,15 +45,12 @@ export function getLLMConfigWithFallback(task: LLMTask): LLMConfig[] {
     options.push(primary);
   }
 
-  // Fallback chain: try all providers that are available
+  // Fallback en orden de costo: Z.ai → Gemini (gratis) → OpenAI
   if (primary.provider !== "zai" && isProviderAvailable("zai")) {
     options.push(buildConfig("zai", "glm-5-turbo"));
   }
   if (primary.provider !== "gemini" && isProviderAvailable("gemini")) {
     options.push(buildConfig("gemini", "gemini-flash-latest"));
-  }
-  if (primary.provider !== "deepseek" && isProviderAvailable("deepseek")) {
-    options.push(buildConfig("deepseek", "deepseek-chat"));
   }
   if (primary.provider !== "openai" && isProviderAvailable("openai")) {
     options.push(buildConfig("openai", "gpt-4o-mini"));
@@ -60,6 +60,9 @@ export function getLLMConfigWithFallback(task: LLMTask): LLMConfig[] {
 }
 
 function buildConfig(provider: LLMProvider, model: string): LLMConfig {
+  if (provider === "deepseek") {
+    return { provider, model, apiKey: process.env.DEEPSEEK_API_KEY || "", baseUrl: "https://api.deepseek.com/v1" };
+  }
   if (provider === "zai") {
     return { provider, model, apiKey: process.env.ZAI_API_KEY || "", baseUrl: "https://api.z.ai/api/paas/v4" };
   }
@@ -68,9 +71,6 @@ function buildConfig(provider: LLMProvider, model: string): LLMConfig {
   }
   if (provider === "openai") {
     return { provider, model, apiKey: process.env.OPENAI_API_KEY || "", baseUrl: "https://api.openai.com/v1" };
-  }
-  if (provider === "deepseek") {
-    return { provider, model, apiKey: process.env.DEEPSEEK_API_KEY || "", baseUrl: "https://api.deepseek.com" };
   }
   throw new Error(`Unknown provider: ${provider}`);
 }
