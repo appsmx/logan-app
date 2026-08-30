@@ -39,8 +39,14 @@ export async function callLLM(request: LLMRequest): Promise<LLMResponse> {
         return await callGemini(config, request);
       } else if (config.provider === "openai") {
         return await callOpenAI(config, request);
-      } else if (config.provider === "deepseek") {
-        return await callDeepSeek(config, request);
+      } else if (
+        config.provider === "deepseek" ||
+        config.provider === "groq" ||
+        config.provider === "openrouter" ||
+        config.provider === "mistral"
+      ) {
+        // Todos usan la API compatible con OpenAI (/chat/completions)
+        return await callOpenAICompatible(config, request);
       }
       errors.push(`[${config.provider}/${config.model}] unknown provider`);
     } catch (e) {
@@ -245,7 +251,9 @@ async function callOpenAI(config: LLMConfig, request: LLMRequest): Promise<LLMRe
 
 
 // ─── DeepSeek (OpenAI-compatible format) ─────────────────────────────────────
-async function callDeepSeek(config: LLMConfig, request: LLMRequest): Promise<LLMResponse> {
+// Handler para proveedores con API compatible con OpenAI (/chat/completions):
+// DeepSeek, Groq, OpenRouter y Mistral usan este mismo formato.
+async function callOpenAICompatible(config: LLMConfig, request: LLMRequest): Promise<LLMResponse> {
   const url = `${config.baseUrl}/chat/completions`;
 
   const messages: LLMMessage[] = [
@@ -277,7 +285,7 @@ async function callDeepSeek(config: LLMConfig, request: LLMRequest): Promise<LLM
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     const msg = err.error?.message || res.statusText;
-    const e = new Error(`DeepSeek API ${res.status}: ${msg}`);
+    const e = new Error(`${config.provider} API ${res.status}: ${msg}`);
     (e as Error & { status?: number }).status = res.status;
     throw e;
   }
@@ -286,12 +294,12 @@ async function callDeepSeek(config: LLMConfig, request: LLMRequest): Promise<LLM
   const text = data.choices?.[0]?.message?.content || "";
 
   if (!text.trim()) {
-    throw new Error("DeepSeek returned empty response");
+    throw new Error(`${config.provider} returned empty response`);
   }
 
   return {
     text,
-    provider: "deepseek",
+    provider: config.provider,
     model: config.model,
     usage: {
       promptTokens: data.usage?.prompt_tokens || 0,

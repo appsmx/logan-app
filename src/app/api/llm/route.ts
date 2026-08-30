@@ -98,7 +98,7 @@ export async function GET() {
   return NextResponse.json({
     service: "Logan LLM Proxy",
     version: "1.0",
-    providers: ["zai", "gemini", "openai", "deepseek"],
+    providers: ["gemini", "groq", "openrouter", "mistral", "zai", "deepseek", "openai"],
     status: "ok",
     docs: "POST /api/llm with { task, systemPrompt, userMessage }",
   });
