@@ -313,3 +313,26 @@ model SupportAsset {
 
   project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
+
+
+// LLM usage tracking — registra cada llamada al proxy /api/llm para control de
+// gasto por proyecto (modelo reseller: LOGAN paga las APIs y cobra a clientes).
+// project es un identificador libre enviado por cada producto (ej: "mariscosquiroa",
+// "restaurant-pos", "mrtramite"). costUsd es una estimación calculada con la
+// tabla de precios por modelo (aproximada, para control interno — no facturación exacta).
+model LlmUsage {
+  id               String   @id @default(cuid())
+  project          String   @default("desconocido") // slug del producto que llamó
+  task             String   @default("assistant")   // tarea LLM (assistant, support, etc.)
+  provider         String                            // gemini | groq | deepseek | openai | ...
+  model            String
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  totalTokens      Int      @default(0)
+  costUsd          Float    @default(0)              // estimación en USD
+  createdAt        DateTime @default(now())
+
+  @@index([project])
+  @@index([createdAt])
+  @@index([provider])
+}

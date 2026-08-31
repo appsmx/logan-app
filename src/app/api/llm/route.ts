@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { callLLM } from "@/lib/llm/client";
 import type { LLMTask } from "@/lib/llm/types";
+import { db } from "@/lib/db";
+import { estimateCostUsd } from "@/lib/llm/usage-cost";
 
 /**
  * POST /api/llm — LLM Proxy endpoint for Logan ecosystem services.
@@ -50,7 +52,7 @@ export async function POST(req: NextRequest) {
     // If no secret is configured (dev mode), allow all requests
 
     const body = await req.json();
-    const { task, systemPrompt, userMessage, history, maxTokens, temperature } = body;
+    const { task, systemPrompt, userMessage, history, maxTokens, temperature, project } = body;
 
     // Validate required fields
     if (!systemPrompt || !userMessage) {
@@ -72,6 +74,27 @@ export async function POST(req: NextRequest) {
       maxTokens: maxTokens || 4096,
       temperature: temperature ?? 0.7,
     });
+
+    // Registrar el uso para control de gasto por proyecto (no bloquea la respuesta)
+    const costUsd = estimateCostUsd(
+      result.model,
+      result.usage?.promptTokens || 0,
+      result.usage?.completionTokens || 0
+    );
+    db.llmUsage
+      .create({
+        data: {
+          project: typeof project === "string" && project.trim() ? project.trim() : "desconocido",
+          task: effectiveTask,
+          provider: result.provider,
+          model: result.model,
+          promptTokens: result.usage?.promptTokens || 0,
+          completionTokens: result.usage?.completionTokens || 0,
+          totalTokens: result.usage?.totalTokens || 0,
+          costUsd,
+        },
+      })
+      .catch((e) => console.error("[/api/llm] No se pudo registrar el uso:", e?.message));
 
     return NextResponse.json({
       text: result.text,
