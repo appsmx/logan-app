@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
-import { ExternalLink, FileText, Clock, Github } from "lucide-react";
+import { ExternalLink, FileText, Clock } from "lucide-react";
 
 type Project = {
   id: string;
@@ -11,7 +11,7 @@ type Project = {
   description: string;
   href?: string;
   hrefLabel?: string;
-  status: "live" | "repo" | "soon";
+  status: "live" | "soon";
   emoji: string;
 };
 
@@ -55,11 +55,6 @@ function statusBadge(s: Project["status"]) {
       return {
         label: "En vivo",
         cls: "bg-[oklch(0.7_0.14_155/0.18)] text-[oklch(0.78_0.14_155)] border-[oklch(0.7_0.14_155/0.4)]",
-      };
-    case "repo":
-      return {
-        label: "Código abierto",
-        cls: "bg-[oklch(0.78_0.16_65/0.18)] text-[oklch(0.85_0.16_65)] border-[oklch(0.78_0.16_65/0.4)]",
       };
     case "soon":
       return {
@@ -158,9 +153,7 @@ export function Projects() {
                       rel="noreferrer"
                       className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-[oklch(0.85_0.16_65)] transition-colors hover:text-[oklch(0.93_0.012_75)]"
                     >
-                      {p.status === "repo" ? (
-                        <Github className="size-3.5" />
-                      ) : p.href?.startsWith("http") ? (
+                      {p.href?.startsWith("http") ? (
                         <ExternalLink className="size-3.5" />
                       ) : (
                         <FileText className="size-3.5" />

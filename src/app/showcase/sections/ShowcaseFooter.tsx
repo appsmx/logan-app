@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Github, BookOpen, Waypoints, ArrowUpRight } from "lucide-react";
+import { Store, BookOpen, Waypoints, ArrowUpRight } from "lucide-react";
 
 const WHATSAPP_URL =
   "https://wa.me/5215512345678?text=Hola%20LOGAN%2C%20quiero%20una%20demostraci%C3%B3n%20completa";
@@ -25,7 +25,7 @@ const FOOTER_LINKS = [
     label: "Logan POS",
     href: "/pos",
     external: false,
-    icon: Github,
+    icon: Store,
   },
 ];
 
