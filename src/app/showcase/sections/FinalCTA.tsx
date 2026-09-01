@@ -7,7 +7,7 @@ import { MessageCircle, Mail, ArrowRight } from "lucide-react";
 const WHATSAPP_URL =
   "https://wa.me/5215512345678?text=Hola%20LOGAN%2C%20quiero%20digitalizar%20mi%20negocio";
 const EMAIL_URL =
-  "mailto:hola@logancorp.mx?subject=Quiero%20digitalizar%20mi%20negocio";
+  "mailto:hola@loganos.com?subject=Quiero%20digitalizar%20mi%20negocio";
 
 export function FinalCTA() {
   return (
@@ -95,7 +95,7 @@ export function FinalCTA() {
             className="inline-flex items-center gap-2 rounded-full border border-[oklch(0.32_0.012_60/70%)] bg-[oklch(0.18_0.012_60/55%)] px-6 py-3 text-sm font-medium text-[oklch(0.93_0.012_75)] backdrop-blur transition-colors hover:border-[oklch(0.78_0.16_65/0.6)] hover:text-[oklch(0.85_0.16_65)]"
           >
             <Mail className="size-4 text-[oklch(0.85_0.16_65)]" />
-            hola@logancorp.mx
+            hola@loganos.com
           </a>
         </div>
 

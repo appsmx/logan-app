@@ -6,7 +6,7 @@ import { Store, BookOpen, Waypoints, ArrowUpRight } from "lucide-react";
 
 const WHATSAPP_URL =
   "https://wa.me/5215512345678?text=Hola%20LOGAN%2C%20quiero%20una%20demostraci%C3%B3n%20completa";
-const EMAIL_URL = "mailto:hola@logancorp.mx";
+const EMAIL_URL = "mailto:hola@loganos.com";
 
 const FOOTER_LINKS = [
   {
@@ -103,7 +103,7 @@ export function ShowcaseFooter() {
               href={EMAIL_URL}
               className="inline-flex items-center gap-1.5 text-sm text-[oklch(0.78_0.012_72)] hover:text-[oklch(0.85_0.16_65)] transition-colors"
             >
-              hola@logancorp.mx
+              hola@loganos.com
             </a>
             <a
               href={WHATSAPP_URL}
