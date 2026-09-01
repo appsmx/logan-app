@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Github, Scale } from "lucide-react";
 
 export function Footer() {
   return (
@@ -20,16 +19,6 @@ export function Footer() {
           </span>
         </div>
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <a
-            href="https://github.com/appsmx/logan"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
-          >
-            <Github className="size-3.5" />
-            github.com/appsmx/logan
-          </a>
-          <span className="text-border">·</span>
           <span>v1.0 · Oficial</span>
         </div>
       </div>
