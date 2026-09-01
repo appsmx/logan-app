@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
  * Admin Section — Logan POS Tenant Management
  *
  * Calls the POS backend API directly (/api/admin/*) to manage tenants.
- * The POS backend CORS allows requests from logancorp.vercel.app.
+ * The POS backend CORS allows requests from loganos.com.
  */
 
 const POS_API_URL = process.env.NEXT_PUBLIC_POS_API_URL || "https://restaurant-pos-api-0mx9.onrender.com/api";
@@ -262,7 +262,7 @@ function TenantsTab() {
                   </span>
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-600">{t.plan}</span>
                 </div>
-                <p className="text-xs text-muted-foreground">{t.slug}.logancorp.mx · {t.businessType.toLowerCase()} · ${t.monthlyRate}/mes</p>
+                <p className="text-xs text-muted-foreground">{t.slug}.loganos.com · {t.businessType.toLowerCase()} · ${t.monthlyRate}/mes</p>
               </div>
             </div>
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -345,7 +345,7 @@ function CreateTenantTab({ onCreated }: { onCreated: () => void }) {
           <Field label="Slug (URL) *" value={form.slug} onChange={(v) => update("slug", v)} placeholder="barberia-mike" />
           {form.slug.length >= 2 && (
             <p className={`text-xs mt-1 ${slugAvailable === true ? "text-green-600" : slugAvailable === false ? "text-destructive" : "text-muted-foreground"}`}>
-              {slugAvailable === true && `✅ ${form.slug}.logancorp.mx disponible`}
+              {slugAvailable === true && `✅ ${form.slug}.loganos.com disponible`}
               {slugAvailable === false && "❌ Slug en uso"}
               {slugAvailable === null && "Verificando..."}
             </p>

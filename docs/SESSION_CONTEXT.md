@@ -2,14 +2,14 @@
 
 **Proyecto:** LOGAN OS (desarrollo del ecosistema)
 **Metodología:** LOGAN v1.0
-**Estado:** LOGAN OS v1.1 — COMPLETO Y EN PRODUCCIÓN. 9/9 roles activos + multi-provider LLM (Z.ai GLM-5.2/5.1/5-turbo con fallback Gemini) + deploy en `logancorp.vercel.app` + Neon Postgres.
+**Estado:** LOGAN OS v1.1 — COMPLETO Y EN PRODUCCIÓN. 9/9 roles activos + multi-provider LLM (Z.ai GLM-5.2/5.1/5-turbo con fallback Gemini) + deploy en `loganos.com` + Neon Postgres.
 **Avance:** Esta sesión cierra el ciclo de construcción de los 9 roles y deja el sistema desplegado con todos los flujos end-to-end funcionando. Pendientes operativos (dominio, créditos, WhatsApp) requieren intervención del usuario.
 
 ---
 
 ## Objetivo completado en esta sesión
 
-Llevar a LOGAN OS desde "2 agentes funcionales (Core + Marketing)" hasta "9/9 roles activos, multi-provider LLM, deploy en Vercel con Postgres" — y dejarlo operando en `logancorp.vercel.app`.
+Llevar a LOGAN OS desde "2 agentes funcionales (Core + Marketing)" hasta "9/9 roles activos, multi-provider LLM, deploy en Vercel con Postgres" — y dejarlo operando en `loganos.com`.
 
 **Construido esta sesión (Tasks 17-34 del worklog):**
 - **7 especialistas nuevos** (Dev, Design, Analytics, Finance, Legal, Support, Assistant) — cada uno con su system-prompt + capabilities + parser defensivo + endpoint `/api/{rol}/execute`.
@@ -32,7 +32,7 @@ Llevar a LOGAN OS desde "2 agentes funcionales (Core + Marketing)" hasta "9/9 ro
 | **GLM-5.1** | Design + Analytics + Legal | Buena calidad, precisión no crítica |
 | **GLM-5-turbo** | Validator + Marketing + Finance + Support + Assistant + Showcase | Barato, customer-facing + tareas simples |
 
-**URL activa:** https://logancorp.vercel.app
+**URL activa:** https://loganos.com
 - `/` — LOGAN OS app (chat con LOGAN, 20 secciones)
 - `/showcase` — página futurista para clientes
 - `/api/core` — LOGAN Core (GLM-5.2)
@@ -51,7 +51,7 @@ Llevar a LOGAN OS desde "2 agentes funcionales (Core + Marketing)" hasta "9/9 ro
 | DEC-LOGAN-013 | Vercel Pro $20/mes cuando el flujo de 3 LLM exceda timeout free de 10s | 2026-08-01 |
 | DEC-LOGAN-014 | `logan` público (metodología) + `logan-app` público (código) + productos privados | 2026-08-08 |
 | DEC-LOGAN-015 | Neubox como proveedor final de dominios `.mx` (~$11 USD primer año) | 2026-08-08 |
-| DEC-LOGAN-016 | `logancorp.mx` como dominio corporativo (showcase, no SaaS) | 2026-08-08 |
+| DEC-LOGAN-016 | `loganos.com` como dominio corporativo (showcase, no SaaS) | 2026-08-08 |
 | DEC-LOGAN-017 | Mix de modelos GLM-5.2/5.1/5-turbo según criticidad de tarea | 2026-08-12 |
 
 ---
@@ -60,10 +60,10 @@ Llevar a LOGAN OS desde "2 agentes funcionales (Core + Marketing)" hasta "9/9 ro
 
 | Documento | Qué cambió |
 |---|---|
-| `os/ECOSYSTEM.md` (repo `logan`) | Hito 2026-08-09 deploy logancorp.vercel.app. Estado ECOSYSTEM → v1.1. |
+| `os/ECOSYSTEM.md` (repo `logan`) | Hito 2026-08-09 deploy loganos.com. Estado ECOSYSTEM → v1.1. |
 | `roles/support/ROLE.md` (repo `logan`) | Subido de planificado v0.1 → activo v1.0 (8 capabilities). |
 | `vision/VISION.md` (repo `logan`) | Añadida DEC-LOGAN-017 sobre mix de modelos GLM. |
-| `README.md` | Reescrito — multi-provider LLM, Postgres Neon, 9 roles, logancorp.vercel.app. |
+| `README.md` | Reescrito — multi-provider LLM, Postgres Neon, 9 roles, loganos.com. |
 | `docs/SESSION_CONTEXT.md` | Este documento. v1.2 — refleja estado post-Task 34. |
 | `worklog.md` | Task 34 añadido: 2 bugfixes críticos (texto cortado + repos dinámicos). |
 | `src/lib/llm/client.ts` | `max_tokens` default 4096 → 8192 (ambas ramas Z.ai + Gemini). |
@@ -77,7 +77,7 @@ Llevar a LOGAN OS desde "2 agentes funcionales (Core + Marketing)" hasta "9/9 ro
 ## Pendientes
 
 ### Operativos (requieren intervención del usuario)
-1. **Comprar `logancorp.mx` en Neubox** (~$11 USD/año). Migrar DNS a Vercel para que el dominio apunte a `logancorp.vercel.app`.
+1. **Comprar `loganos.com` en Neubox** (~$11 USD/año). Migrar DNS a Vercel para que el dominio apunte a `loganos.com`.
 2. **Configurar Google Workspace** para correos (1-2 días propagación DNS). Permite `hola@logancorp.mx` y forward a WhatsApp.
 3. **Cargar $200 USD en Z.ai** cuando haya capital. Hoy el tier gratuito de GLM puede tener saturación o agotarse — la app devuelve `503 LOGAN Core no disponible` cuando esto ocurre.
 4. **Activar Vercel Pro** ($20/mes) cuando el flujo de 3 llamadas LLM exceda el timeout free de 10s en producción (DEC-LOGAN-013). Hoy por hoy el tier free funciona para turnos sin delegación (~5-8s).
@@ -88,7 +88,7 @@ Llevar a LOGAN OS desde "2 agentes funcionales (Core + Marketing)" hasta "9/9 ro
 ### Estratégicos
 - **Verificar que las variables de entorno de Vercel estén completas:** `ZAI_API_KEY`, `GEMINI_API_KEY`, `GITHUB_TOKEN`, `LOGAN_ALLOWED_REPOS`, `LOGAN_GITHUB_OWNER`, `VERCEL_TOKEN`, `VERCEL_TEAM_SLUG`, `DATABASE_URL` (Neon Postgres). Síntoma de `ZAI_API_KEY` faltante o sin créditos: el chat devuelve "LOGAN Core no disponible en este momento" en ~1s.
 - **Etapa 5: Hércules Bro.** Segundo producto comercial.
-- **Etapa 6: LOGAN corporativo en `logancorp.mx`.** Validar el modelo reseller con el primer cliente externo.
+- **Etapa 6: LOGAN corporativo en `loganos.com`.** Validar el modelo reseller con el primer cliente externo.
 
 ### Deuda técnica conocida
 - `z-ai-web-dev-sdk` aún en `package.json` deps pero sin uso en `src/` (deuda explícita del Task 33).
