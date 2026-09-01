@@ -15,7 +15,7 @@ type Message = {
 const WHATSAPP_URL =
   "https://wa.me/5215512345678?text=Hola%20LOGAN%2C%20quiero%20una%20demostraci%C3%B3n%20completa";
 const EMAIL_URL =
-  "mailto:hola@logancorp.mx?subject=Demostraci%C3%B3n%20LOGAN";
+  "mailto:hola@loganos.com?subject=Demostraci%C3%B3n%20LOGAN";
 
 const SUGGESTIONS = [
   "¿Qué eres, LOGAN?",

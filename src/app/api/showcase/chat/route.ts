@@ -16,7 +16,7 @@ import { buildShowcaseSystemPrompt } from "@/lib/showcase/system-prompt";
 import { checkRateLimit } from "@/lib/showcase/rate-limit";
 
 const WHATSAPP_URL = "https://wa.me/5215512345678?text=Hola%20LOGAN%2C%20quiero%20una%20demostraci%C3%B3n%20completa";
-const EMAIL_URL = "mailto:hola@logancorp.mx?subject=Demostraci%C3%B3n%20LOGAN";
+const EMAIL_URL = "mailto:hola@loganos.com?subject=Demostraci%C3%B3n%20LOGAN";
 
 type RequestBody = { message?: string };
 
