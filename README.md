@@ -6,7 +6,7 @@ LOGAN evolucionó de una metodología (`LOGAN.md`, v1.0, la Constitución) a un 
 
 > **El diferenciador:** toda decisión de un especialista deja constancia de *por qué* se tomó (una hipótesis verificable). Analytics verifica con el tiempo. Si se refuta, LOGAN aprende y actualiza su estrategia. El activo acumulado con los años son las hipótesis verificadas, no el código.
 
-> **Estado actual (v0.2.1):** LOGAN OS v1.1 — completo y en producción en `logancorp.vercel.app`. 9/9 roles activos + multi-provider LLM (GLM-5.2/5.1/5-turbo vía Z.ai, Gemini fallback) + Neon Postgres + integraciones GitHub (4 tools) y Vercel (3 tools).
+> **Estado actual (v0.2.1):** LOGAN OS v1.1 — completo y en producción en `loganos.com`. 9/9 roles activos + multi-provider LLM (GLM-5.2/5.1/5-turbo vía Z.ai, Gemini fallback) + Neon Postgres + integraciones GitHub (4 tools) y Vercel (3 tools).
 
 ## Estructura del repositorio
 
@@ -99,7 +99,7 @@ Cada turno: Core lee la Constitución + la Biblia del proyecto + el reporte de M
 - **DEC-LOGAN-006:** independencia del proveedor LLM (Z.ai + Gemini, sin SDK acoplado).
 - **DEC-LOGAN-013:** Vercel Pro ($20/mes) cuando el flujo de 3 llamadas LLM exceda el timeout de 10s del tier free.
 - **DEC-LOGAN-014:** repos separados — `logan` (metodología) público + `logan-app` (este repo) + productos privados.
-- **DEC-LOGAN-016:** `logancorp.mx` como dominio corporativo (showcase ilustrativo, no SaaS).
+- **DEC-LOGAN-016:** `loganos.com` como dominio corporativo (showcase ilustrativo, no SaaS).
 - **DEC-LOGAN-017:** mix de modelos GLM-5.2/5.1/5-turbo según la criticidad de cada tarea.
 
 ## Estado
@@ -108,9 +108,9 @@ Cada turno: Core lee la Constitución + la Biblia del proyecto + el reporte de M
 - ✅ Etapa 2 (LOGAN Core funcional) — cerrada.
 - ✅ Etapa 3 (LOGAN Marketing funcional) — cerrada.
 - ✅ Etapa 4-4.5 (Mr. Trámite + Dev/Design/Analytics/Finance/Legal/Support) — cerradas.
-- ✅ Deploy en Vercel (`logancorp.vercel.app`) + Neon Postgres + multi-provider LLM.
+- ✅ Deploy en Vercel (`loganos.com`) + Neon Postgres + multi-provider LLM.
 - ⏳ Etapa 5 (Hércules Bro) — pendiente.
-- ⏳ Etapa 6 (LOGAN corporativo en `logancorp.mx`) — pendiente (deploy del dominio).
+- ⏳ Etapa 6 (LOGAN corporativo en `loganos.com`) — pendiente (deploy del dominio).
 
 ## Fuente
 

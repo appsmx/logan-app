@@ -26,6 +26,10 @@ const ALLOWED_ORIGINS = [
   "https://mrtramite.mx",
   "https://www.mrtramite.mx",
   "https://mrtramite.vercel.app",
+  "https://loganos.com",
+  "https://www.loganos.com",
+  // Dominio anterior en Vercel — se mantiene temporalmente mientras propaga
+  // el DNS de loganos.com. Puede eliminarse una vez completada la migración.
   "https://logancorp.vercel.app",
   "http://localhost:3000",
   "http://localhost:3001",
