@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="LOGAN OS — orquestación de roles de IA (monograma L)">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="LOGAN OS — monograma L con orquestación de nodos">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#161311"/>
       <stop offset="1" stop-color="#0b0908"/>
     </linearGradient>
-    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffc15e"/>
+    <linearGradient id="amber" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#ffd27a"/>
       <stop offset="0.5" stop-color="#f7982f"/>
       <stop offset="1" stop-color="#d1611e"/>
     </linearGradient>
-    <radialGradient id="core" cx="0.5" cy="0.4" r="0.6">
-      <stop offset="0" stop-color="#ffe3a8"/>
-      <stop offset="0.5" stop-color="#ffb347"/>
-      <stop offset="1" stop-color="#e07a24"/>
-    </radialGradient>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="5" result="b"/>
+    <!-- glow SOLO para los nodos de acento, no para la L -->
+    <filter id="nodeGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
       <feMerge>
         <feMergeNode in="b"/>
         <feMergeNode in="SourceGraphic"/>
@@ -27,48 +23,49 @@
   <!-- Placa base -->
   <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bg)" stroke="#2a2320" stroke-width="2"/>
 
-  <!-- Anillo orbital giratorio -->
-  <circle cx="256" cy="256" r="168" fill="none" stroke="#ffb347" stroke-opacity="0.12" stroke-width="2"/>
-  <circle cx="256" cy="256" r="168" fill="none" stroke="#ffb347" stroke-opacity="0.26" stroke-width="2" stroke-dasharray="5 26" stroke-linecap="round">
-    <animateTransform attributeName="transform" type="rotate" from="0 256 256" to="360 256 256" dur="26s" repeatCount="indefinite"/>
+  <!-- Anillo orbital tenue giratorio (contexto de sistema) -->
+  <circle cx="256" cy="256" r="176" fill="none" stroke="#ffb347" stroke-opacity="0.10" stroke-width="2"/>
+  <circle cx="256" cy="256" r="176" fill="none" stroke="#ffb347" stroke-opacity="0.22" stroke-width="2" stroke-dasharray="4 30" stroke-linecap="round">
+    <animateTransform attributeName="transform" type="rotate" from="0 256 256" to="360 256 256" dur="28s" repeatCount="indefinite"/>
   </circle>
 
-  <!-- Líneas de orquestación: la 'L' distribuye a los nodos satélite -->
-  <g stroke="url(#amber)" stroke-width="4" stroke-opacity="0.5" stroke-linecap="round">
-    <line x1="196" y1="150" x2="196" y2="96"/>
-    <line x1="196" y1="150" x2="120" y2="200"/>
-    <line x1="316" y1="362" x2="392" y2="362"/>
-    <line x1="316" y1="362" x2="384" y2="300"/>
-    <line x1="196" y1="362" x2="150" y2="416"/>
+  <!-- ===================== LA 'L' — nítida y protagonista ===================== -->
+  <!-- Trazo sólido, sin glow, esquinas redondeadas -->
+  <path d="M188 132 L188 348 L360 348"
+        fill="none"
+        stroke="url(#amber)"
+        stroke-width="54"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  <!-- Reflejo/borde interior para dar sensación 3D/tech -->
+  <path d="M188 132 L188 348 L360 348"
+        fill="none"
+        stroke="#fff4dd"
+        stroke-opacity="0.35"
+        stroke-width="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        transform="translate(-8,-8)"/>
+
+  <!-- ===================== Nodos de orquestación conectados a la L ===================== -->
+  <!-- Líneas finas que salen de la L hacia los nodos satélite -->
+  <g stroke="url(#amber)" stroke-width="5" stroke-opacity="0.7" stroke-linecap="round">
+    <line x1="188" y1="132" x2="256" y2="86"/>
+    <line x1="360" y1="348" x2="416" y2="300"/>
+    <line x1="188" y1="240" x2="120" y2="200"/>
   </g>
 
-  <!-- Nodos satélite (roles orquestados) -->
-  <g fill="url(#amber)" filter="url(#glow)">
-    <circle cx="196" cy="96" r="20"/>
+  <!-- Nodos satélite (roles) — glow permitido, son puntos, no interfieren con leer la L -->
+  <g fill="url(#amber)" filter="url(#nodeGlow)">
+    <circle cx="256" cy="86" r="22"/>
+    <circle cx="416" cy="300" r="20"/>
     <circle cx="120" cy="200" r="18"/>
-    <circle cx="392" cy="362" r="20"/>
-    <circle cx="384" cy="300" r="16"/>
-    <circle cx="150" cy="416" r="18"/>
   </g>
 
-  <!-- Monograma 'L' formado por barras de nodos conectados (estructura del sistema) -->
-  <!-- Vástago vertical -->
-  <g stroke-linecap="round">
-    <path d="M196 150 L196 362" fill="none" stroke="url(#core)" stroke-width="40" filter="url(#glow)"/>
-    <!-- Base horizontal -->
-    <path d="M196 362 L316 362" fill="none" stroke="url(#core)" stroke-width="40" filter="url(#glow)"/>
-  </g>
-
-  <!-- Vértices luminosos de la L (nodos principales del hub) -->
-  <g fill="#fff4dd" filter="url(#glow)">
-    <circle cx="196" cy="150" r="16"/>
-    <circle cx="316" cy="362" r="16"/>
-  </g>
-
-  <!-- Nodo-codo con pulso (el 'core' de la L) -->
-  <circle cx="196" cy="362" r="26" fill="url(#core)" filter="url(#glow)"/>
-  <circle cx="196" cy="362" r="26" fill="none" stroke="#fff4dd" stroke-opacity="0.7" stroke-width="3">
-    <animate attributeName="r" values="26;54;26" dur="3s" repeatCount="indefinite"/>
+  <!-- Nodo-núcleo en la base de la L (LOGAN Core) con pulso -->
+  <circle cx="360" cy="348" r="26" fill="#ffe3a8" filter="url(#nodeGlow)"/>
+  <circle cx="360" cy="348" r="26" fill="none" stroke="#fff4dd" stroke-opacity="0.7" stroke-width="3">
+    <animate attributeName="r" values="26;52;26" dur="3s" repeatCount="indefinite"/>
     <animate attributeName="stroke-opacity" values="0.7;0;0.7" dur="3s" repeatCount="indefinite"/>
   </circle>
 </svg>
