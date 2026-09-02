@@ -1,29 +1,70 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 30 30" style="enable-background:new 0 0 30 30;" xml:space="preserve">
-<defs>
-  <style type="text/css">
-    .st194{fill:#2D2D2D;stroke:#FFFFFF;stroke-width:0.6317;stroke-miterlimit:10;}
-    .st23{fill:#FFFFFF;}
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="LOGAN OS — orquestación de roles de IA">
+  <defs>
+    <!-- Fondo tech oscuro -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#161311"/>
+      <stop offset="1" stop-color="#0b0908"/>
+    </linearGradient>
 
-    .z-breathe {
-      animation: breathe 2.5s ease-in-out infinite;
-    }
+    <!-- Gradiente de marca ámbar → naranja (traducido de oklch 0.78/0.16/65 → 0.55/0.14/35) -->
+    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffc15e"/>
+      <stop offset="0.5" stop-color="#f7982f"/>
+      <stop offset="1" stop-color="#d1611e"/>
+    </linearGradient>
 
-    @keyframes breathe {
-      0%, 100% { opacity: 0.7; }
-      50% { opacity: 1; }
-    }
-  </style>
-</defs>
+    <radialGradient id="core" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe3a8"/>
+      <stop offset="0.45" stop-color="#ffb347"/>
+      <stop offset="1" stop-color="#e07a24"/>
+    </radialGradient>
 
-<g>
-  <path class="st194" d="M24.51,28.51H5.49c-2.21,0-4-1.79-4-4V5.49c0-2.21,1.79-4,4-4h19.03c2.21,0,4,1.79,4,4v19.03
-    C28.51,26.72,26.72,28.51,24.51,28.51z"/>
-  <g class="z-breathe">
-    <path class="st23" d="M15.47,7.1l-1.3,1.85c-0.2,0.29-0.54,0.47-0.9,0.47h-7.1V7.09C6.16,7.1,15.47,7.1,15.47,7.1z"/>
-    <polygon class="st23" points="24.3,7.1 13.14,22.91 5.7,22.91 16.86,7.1"/>
-    <path class="st23" d="M14.53,22.91l1.31-1.86c0.2-0.29,0.54-0.47,0.9-0.47h7.09v2.33H14.53z"/>
+    <!-- Glow suave -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Placa base redondeada -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bg)" stroke="#2a2320" stroke-width="2"/>
+
+  <!-- Anillo orbital tenue -->
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffb347" stroke-opacity="0.14" stroke-width="2"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffb347" stroke-opacity="0.28" stroke-width="2" stroke-dasharray="6 22" stroke-linecap="round">
+    <animateTransform attributeName="transform" type="rotate" from="0 256 256" to="360 256 256" dur="24s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Líneas de conexión (orquestación): del hub central a los 6 nodos -->
+  <g stroke="url(#amber)" stroke-width="4" stroke-opacity="0.55" stroke-linecap="round">
+    <line x1="256" y1="256" x2="256" y2="106"/>
+    <line x1="256" y1="256" x2="386" y2="181"/>
+    <line x1="256" y1="256" x2="386" y2="331"/>
+    <line x1="256" y1="256" x2="256" y2="406"/>
+    <line x1="256" y1="256" x2="126" y2="331"/>
+    <line x1="256" y1="256" x2="126" y2="181"/>
   </g>
-</g>
+
+  <!-- Nodos satélite (roles) -->
+  <g fill="url(#amber)" filter="url(#glow)">
+    <circle cx="256" cy="106" r="24"/>
+    <circle cx="386" cy="181" r="24"/>
+    <circle cx="386" cy="331" r="24"/>
+    <circle cx="256" cy="406" r="24"/>
+    <circle cx="126" cy="331" r="24"/>
+    <circle cx="126" cy="181" r="24"/>
+  </g>
+
+  <!-- Hub central (LOGAN Core) con pulso -->
+  <circle cx="256" cy="256" r="66" fill="url(#core)" filter="url(#glow)">
+    <animate attributeName="r" values="62;70;62" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="256" cy="256" r="66" fill="none" stroke="#fff4dd" stroke-opacity="0.75" stroke-width="3">
+    <animate attributeName="r" values="66;96;66" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="stroke-opacity" values="0.7;0;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
 </svg>
