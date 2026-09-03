@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- LOGAN — wordmark oficial: símbolo L-átomo ámbar neón + texto LOGAN (horizontal, para header) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 220" width="760" height="220" role="img" aria-label="LOGAN — sistema operativo de IA">
+  <defs>
+    <linearGradient id="amberW" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd27a"/><stop offset="0.55" stop-color="#f7982f"/><stop offset="1" stop-color="#d1611e"/>
+    </linearGradient>
+    <filter id="gW" x="-90%" y="-90%" width="280%" height="280%">
+      <feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="neonW" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- símbolo -->
+  <g transform="translate(24,26)">
+    <g fill="none" stroke="url(#amberW)" stroke-width="2.6" stroke-opacity="0.4">
+      <ellipse cx="84" cy="84" rx="70" ry="28" transform="rotate(30 84 84)"/>
+      <ellipse cx="84" cy="84" rx="70" ry="28" transform="rotate(90 84 84)"/>
+      <ellipse cx="84" cy="84" rx="70" ry="28" transform="rotate(150 84 84)"/>
+    </g>
+    <g fill="url(#amberW)" filter="url(#gW)">
+      <circle r="7">
+        <animateMotion dur="6s" repeatCount="indefinite" path="M 84 14 a 70 28 30 1 0 0 140 a 70 28 30 1 0 0 -140"/>
+      </circle>
+      <circle r="7">
+        <animateMotion dur="7.5s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" path="M 84 14 a 70 28 90 1 0 0 140 a 70 28 90 1 0 0 -140"/>
+      </circle>
+    </g>
+    <path d="M62 44 L62 128 L128 128" fill="none" stroke="url(#amberW)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" filter="url(#neonW)"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="220" y="128" font-family="'Geist','Segoe UI',system-ui,sans-serif" font-size="104" font-weight="700" letter-spacing="3" fill="url(#amberW)">LOGAN</text>
+  <text x="224" y="176" font-family="'Geist Mono','Courier New',monospace" font-size="18" letter-spacing="7" fill="#b89a7e">SISTEMA OPERATIVO DE IA</text>
+</svg>

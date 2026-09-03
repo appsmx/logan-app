@@ -1,70 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="LOGAN OS — orquestación de roles de IA">
+<!-- LOGAN — logo oficial: monograma L con estructura atómica (orquestación), ámbar neón -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="LOGAN — L con estructura atómica">
   <defs>
-    <!-- Fondo tech oscuro -->
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#161311"/>
-      <stop offset="1" stop-color="#0b0908"/>
+    <linearGradient id="bgA2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#161311"/><stop offset="1" stop-color="#0b0908"/>
     </linearGradient>
-
-    <!-- Gradiente de marca ámbar → naranja (traducido de oklch 0.78/0.16/65 → 0.55/0.14/35) -->
-    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffc15e"/>
-      <stop offset="0.5" stop-color="#f7982f"/>
-      <stop offset="1" stop-color="#d1611e"/>
+    <linearGradient id="amberL" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd27a"/><stop offset="0.55" stop-color="#f7982f"/><stop offset="1" stop-color="#d1611e"/>
     </linearGradient>
-
-    <radialGradient id="core" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#ffe3a8"/>
-      <stop offset="0.45" stop-color="#ffb347"/>
-      <stop offset="1" stop-color="#e07a24"/>
-    </radialGradient>
-
-    <!-- Glow suave -->
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="6" result="b"/>
-      <feMerge>
-        <feMergeNode in="b"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <filter id="gA2" x="-90%" y="-90%" width="280%" height="280%">
+      <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- glow neón para la L -->
+    <filter id="neonL" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="7" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
 
-  <!-- Placa base redondeada -->
-  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bg)" stroke="#2a2320" stroke-width="2"/>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bgA2)" stroke="#2a2320" stroke-width="2"/>
 
-  <!-- Anillo orbital tenue -->
-  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffb347" stroke-opacity="0.14" stroke-width="2"/>
-  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffb347" stroke-opacity="0.28" stroke-width="2" stroke-dasharray="6 22" stroke-linecap="round">
-    <animateTransform attributeName="transform" type="rotate" from="0 256 256" to="360 256 256" dur="24s" repeatCount="indefinite"/>
-  </circle>
-
-  <!-- Líneas de conexión (orquestación): del hub central a los 6 nodos -->
-  <g stroke="url(#amber)" stroke-width="4" stroke-opacity="0.55" stroke-linecap="round">
-    <line x1="256" y1="256" x2="256" y2="106"/>
-    <line x1="256" y1="256" x2="386" y2="181"/>
-    <line x1="256" y1="256" x2="386" y2="331"/>
-    <line x1="256" y1="256" x2="256" y2="406"/>
-    <line x1="256" y1="256" x2="126" y2="331"/>
-    <line x1="256" y1="256" x2="126" y2="181"/>
+  <!-- órbitas atómicas -->
+  <g fill="none" stroke="url(#amberL)" stroke-width="4" stroke-opacity="0.38">
+    <ellipse cx="256" cy="256" rx="140" ry="56" transform="rotate(30 256 256)"/>
+    <ellipse cx="256" cy="256" rx="140" ry="56" transform="rotate(90 256 256)"/>
+    <ellipse cx="256" cy="256" rx="140" ry="56" transform="rotate(150 256 256)"/>
   </g>
 
-  <!-- Nodos satélite (roles) -->
-  <g fill="url(#amber)" filter="url(#glow)">
-    <circle cx="256" cy="106" r="24"/>
-    <circle cx="386" cy="181" r="24"/>
-    <circle cx="386" cy="331" r="24"/>
-    <circle cx="256" cy="406" r="24"/>
-    <circle cx="126" cy="331" r="24"/>
-    <circle cx="126" cy="181" r="24"/>
+  <!-- electrones girando en sentidos opuestos -->
+  <g fill="url(#amberL)" filter="url(#gA2)">
+    <circle r="12">
+      <animateMotion dur="6s" repeatCount="indefinite"
+        path="M 256 116 a 140 56 30 1 0 0 280 a 140 56 30 1 0 0 -280"/>
+    </circle>
+    <circle r="12">
+      <animateMotion dur="7.5s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear"
+        path="M 256 116 a 140 56 90 1 0 0 280 a 140 56 90 1 0 0 -280"/>
+    </circle>
+    <circle r="12">
+      <animateMotion dur="9s" repeatCount="indefinite"
+        path="M 256 116 a 140 56 150 1 0 0 280 a 140 56 150 1 0 0 -280"/>
+    </circle>
   </g>
 
-  <!-- Hub central (LOGAN Core) con pulso -->
-  <circle cx="256" cy="256" r="66" fill="url(#core)" filter="url(#glow)">
-    <animate attributeName="r" values="62;70;62" dur="3s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="256" cy="256" r="66" fill="none" stroke="#fff4dd" stroke-opacity="0.75" stroke-width="3">
-    <animate attributeName="r" values="66;96;66" dur="3s" repeatCount="indefinite"/>
-    <animate attributeName="stroke-opacity" values="0.7;0;0.7" dur="3s" repeatCount="indefinite"/>
-  </circle>
+  <!-- L protagonista con glow neón -->
+  <path d="M200 148 L200 356 L350 356" fill="none" stroke="url(#amberL)" stroke-width="52" stroke-linecap="round" stroke-linejoin="round" filter="url(#neonL)"/>
+  <path d="M200 148 L200 356 L350 356" fill="none" stroke="#fff4dd" stroke-opacity="0.35" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" transform="translate(-7,-7)"/>
+  <circle cx="200" cy="356" r="15" fill="#fff4dd" filter="url(#gA2)"/>
 </svg>
