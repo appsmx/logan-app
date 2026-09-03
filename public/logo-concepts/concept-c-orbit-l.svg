@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CONCEPTO C — "L en órbita": L sólida legible + UN solo satélite orbitando (orquestación sutil, no caótica) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="LOGAN — L en órbita">
+  <defs>
+    <linearGradient id="bgC" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#171310"/><stop offset="1" stop-color="#0b0908"/>
+    </linearGradient>
+    <linearGradient id="amberC" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd27a"/><stop offset="0.55" stop-color="#f7982f"/><stop offset="1" stop-color="#d1611e"/>
+    </linearGradient>
+    <filter id="gC" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bgC)" stroke="#2a2320" stroke-width="2"/>
+  <!-- órbita elíptica inclinada -->
+  <g>
+    <ellipse cx="256" cy="256" rx="182" ry="96" fill="none" stroke="url(#amberC)" stroke-opacity="0.35" stroke-width="4" transform="rotate(-28 256 256)"/>
+    <!-- satélite que recorre la órbita -->
+    <circle r="17" fill="url(#amberC)" filter="url(#gC)">
+      <animateMotion dur="7s" repeatCount="indefinite" rotate="auto"
+        path="M 74 256 a 182 96 0 1 0 364 0 a 182 96 0 1 0 -364 0" />
+    </circle>
+  </g>
+  <!-- L sólida protagonista -->
+  <path d="M200 148 L200 356 L346 356" fill="none" stroke="url(#amberC)" stroke-width="50" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M200 148 L200 356 L346 356" fill="none" stroke="#fff4dd" stroke-opacity="0.30" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" transform="translate(-7,-7)"/>
+</svg>
