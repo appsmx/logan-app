@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- FINAL — L átomo, versión TORNASOL (paleta del POS: cian→violeta→cian) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="LOGAN — L con estructura atómica, tornasol">
+  <defs>
+    <linearGradient id="bgI" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1224"/><stop offset="1" stop-color="#060918"/>
+    </linearGradient>
+    <!-- tornasol del POS -->
+    <linearGradient id="irisL" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7dd3fc"/>
+      <stop offset="0.5" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="orbit1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient id="orbit2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a855f7"/><stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+    <filter id="gI" x="-90%" y="-90%" width="280%" height="280%">
+      <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bgI)" stroke="#241c3a" stroke-width="2"/>
+
+  <!-- ===== Estructura atómica: 3 órbitas cruzadas ===== -->
+  <g fill="none" stroke-width="4">
+    <ellipse cx="256" cy="256" rx="184" ry="74" stroke="url(#orbit1)" stroke-opacity="0.4" transform="rotate(30 256 256)"/>
+    <ellipse cx="256" cy="256" rx="184" ry="74" stroke="url(#orbit2)" stroke-opacity="0.4" transform="rotate(90 256 256)"/>
+    <ellipse cx="256" cy="256" rx="184" ry="74" stroke="url(#orbit1)" stroke-opacity="0.4" transform="rotate(150 256 256)"/>
+  </g>
+
+  <!-- Electrones girando en sentidos opuestos -->
+  <g filter="url(#gI)">
+    <circle r="13" fill="#7dd3fc">
+      <animateMotion dur="6s" repeatCount="indefinite"
+        path="M 256 74 a 184 74 30 1 0 0 364 a 184 74 30 1 0 0 -364"/>
+    </circle>
+    <circle r="13" fill="#a855f7">
+      <animateMotion dur="7.5s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear"
+        path="M 256 74 a 184 74 90 1 0 0 364 a 184 74 90 1 0 0 -364"/>
+    </circle>
+    <circle r="13" fill="#c4b5fd">
+      <animateMotion dur="9s" repeatCount="indefinite"
+        path="M 256 74 a 184 74 150 1 0 0 364 a 184 74 150 1 0 0 -364"/>
+    </circle>
+  </g>
+
+  <!-- ===== L protagonista, tornasol, sólida ===== -->
+  <path d="M200 148 L200 356 L350 356" fill="none" stroke="url(#irisL)" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M200 148 L200 356 L350 356" fill="none" stroke="#ffffff" stroke-opacity="0.30" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" transform="translate(-7,-7)"/>
+
+  <!-- núcleo del átomo en el codo de la L -->
+  <circle cx="200" cy="356" r="15" fill="#ffffff" filter="url(#gI)"/>
+</svg>
