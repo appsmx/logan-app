@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 
@@ -43,11 +44,17 @@ export function ShowcaseNav() {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="relative flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-[oklch(0.78_0.16_65)] to-[oklch(0.62_0.13_35)] shadow-[0_0_24px_oklch(0.78_0.16_65/0.45)]"
+            className="relative size-10"
           >
-            <span className="font-serif text-xl leading-none text-[oklch(0.16_0.008_60)]">
-              L
-            </span>
+            <Image
+              src="/logo.svg"
+              alt="LOGAN"
+              width={40}
+              height={40}
+              priority
+              unoptimized
+              className="size-10"
+            />
           </motion.div>
           <div className="hidden sm:flex flex-col leading-tight">
             <span className="font-serif text-lg tracking-tight text-[oklch(0.93_0.012_75)]">
