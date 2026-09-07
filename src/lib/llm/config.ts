@@ -19,7 +19,11 @@ const TASK_MODEL_MAP: Record<LLMTask, { provider: LLMProvider; model: string }> 
   marketing:       { provider: "gemini", model: "gemini-2.5-flash" },
   finance:         { provider: "gemini", model: "gemini-2.5-flash" },
   support:         { provider: "gemini", model: "gemini-2.5-flash" },
-  assistant:       { provider: "gemini", model: "gemini-2.5-flash" },
+  // assistant: usado por bots de cara al cliente (ej. Mariscos Quiroa) que
+  // dependen de function calling multi-turno confiable. DeepSeek maneja tools
+  // mejor que los modelos medianos gratuitos, así que va primero para esta tarea.
+  // Si falla, la cascada cae a los gratuitos (Groq → Gemini → ...).
+  assistant:       { provider: "deepseek", model: "deepseek-chat" },
   showcase:        { provider: "gemini", model: "gemini-2.5-flash" },
 };
 
@@ -39,17 +43,20 @@ export function isProviderAvailable(provider: LLMProvider): boolean {
   return false;
 }
 
-// Cascada por COSTO (gratis primero → de pago al final):
-//   Gemini → Groq → OpenRouter → Mistral → Z.ai → DeepSeek → OpenAI
+// Cascada priorizando FIABILIDAD EN FUNCTION CALLING (tool use), luego costo:
+//   DeepSeek → Groq → Gemini → Z.ai → Mistral → OpenRouter → OpenAI
+// DeepSeek (muy barato) y Groq (gratis, Llama-3-Groq-Tool-Use) manejan tools de
+// forma más confiable que los modelos medianos; Gemini queda como buen fallback
+// gratis. OpenRouter va al final porque su soporte de tools es inconsistente
+// (y se salta del todo cuando la petición trae tools; ver NO_TOOL_SUPPORT).
 // Cada proveedor se agrega solo si su API key está configurada.
-// Modelo por defecto de cada uno en el fallback (barato/gratis):
 const FALLBACK_ORDER: { provider: LLMProvider; model: string }[] = [
-  { provider: "gemini", model: "gemini-2.5-flash" },                          // gratis
-  { provider: "groq", model: "llama-3.3-70b-versatile" },                     // gratis
-  { provider: "openrouter", model: "meta-llama/llama-3.3-70b-instruct:free" },// gratis
-  { provider: "mistral", model: "mistral-small-latest" },                     // gratis
+  { provider: "deepseek", model: "deepseek-chat" },                           // barato, fuerte en tools
+  { provider: "groq", model: "llama-3.3-70b-versatile" },                     // gratis, rápido, bueno en tools
+  { provider: "gemini", model: "gemini-2.5-flash" },                          // gratis, buen fallback general
   { provider: "zai", model: "glm-5-turbo" },                                  // barato
-  { provider: "deepseek", model: "deepseek-chat" },                           // de pago (barato)
+  { provider: "mistral", model: "mistral-small-latest" },                     // gratis
+  { provider: "openrouter", model: "meta-llama/llama-3.3-70b-instruct:free" },// gratis (sin tools fiables)
   { provider: "openai", model: "gpt-4o-mini" },                               // de pago (último recurso)
 ];
 
