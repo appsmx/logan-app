@@ -16,9 +16,11 @@ import { estimateCostUsd } from "@/lib/llm/usage-cost";
  *   task: LLMTask (e.g., "assistant", "analytics", "support")
  *   systemPrompt: string
  *   userMessage: string
- *   history?: { role: "user"|"assistant"|"system", content: string }[]
+ *   history?: { role: "user"|"assistant"|"system"|"tool", content: string, ... }[]
  *   maxTokens?: number
  *   temperature?: number
+ *   tools?: LLMTool[]          // opcional: function calling. Si se omite, solo texto.
+ *   toolChoice?: "auto"|"none"|{ type:"function", function:{ name } }
  * }
  *
  * Response:
@@ -26,6 +28,7 @@ import { estimateCostUsd } from "@/lib/llm/usage-cost";
  *   text: string
  *   provider: string
  *   model: string
+ *   toolCalls?: LLMToolCall[]  // presente si el modelo pidió ejecutar herramientas
  * }
  */
 
@@ -52,7 +55,7 @@ export async function POST(req: NextRequest) {
     // If no secret is configured (dev mode), allow all requests
 
     const body = await req.json();
-    const { task, systemPrompt, userMessage, history, maxTokens, temperature, project } = body;
+    const { task, systemPrompt, userMessage, history, maxTokens, temperature, project, tools, toolChoice } = body;
 
     // Validate required fields
     if (!systemPrompt || !userMessage) {
@@ -73,6 +76,10 @@ export async function POST(req: NextRequest) {
       history: history || [],
       maxTokens: maxTokens || 4096,
       temperature: temperature ?? 0.7,
+      // function calling (opcional): si no viene `tools`, el comportamiento es
+      // idéntico al anterior (solo texto).
+      tools: Array.isArray(tools) && tools.length > 0 ? tools : undefined,
+      toolChoice,
     });
 
     // Registrar el uso para control de gasto por proyecto (no bloquea la respuesta)
@@ -101,6 +108,10 @@ export async function POST(req: NextRequest) {
       provider: result.provider,
       model: result.model,
       usage: result.usage,
+      // Solo presente si el modelo decidió invocar herramientas.
+      ...(result.toolCalls && result.toolCalls.length > 0
+        ? { toolCalls: result.toolCalls }
+        : {}),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
