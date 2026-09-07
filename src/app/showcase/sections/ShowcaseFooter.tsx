@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Store, BookOpen, Waypoints, ArrowUpRight } from "lucide-react";
 
 const WHATSAPP_URL =
@@ -37,14 +38,15 @@ export function ShowcaseFooter() {
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
           <div className="max-w-sm">
             <div className="flex items-center gap-3">
-              <div
-                className="flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-[oklch(0.78_0.16_65)] to-[oklch(0.55_0.14_35)]"
+              <Image
+                src="/logo.svg"
+                alt="LOGAN"
+                width={40}
+                height={40}
+                unoptimized
+                className="size-10"
                 aria-hidden
-              >
-                <span className="font-serif text-xl leading-none text-[oklch(0.14_0.008_60)]">
-                  L
-                </span>
-              </div>
+              />
               <div className="flex flex-col leading-tight">
                 <span className="font-serif text-lg text-[oklch(0.93_0.012_75)]">
                   LOGAN
