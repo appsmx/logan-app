@@ -36,6 +36,11 @@ model Project {
   // Ej. slug="mariscosquiroa" → mariscosquiroa.loganos.com. Único. Null = sin
   // subdominio (se accede por /panel/[id]).
   slug        String?  @unique
+  // "Cerebro" del bot del proyecto (DEC-LOGAN-021, Opción A). Endpoint del
+  // agente del negocio al que el handoff delega en modo BOT (recibe
+  // {message, history} y devuelve {content}). Ej. Mariscos:
+  // "https://www.mariscosquiroa.com/api/chat". Null = usa el prompt genérico.
+  botEndpointUrl String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
