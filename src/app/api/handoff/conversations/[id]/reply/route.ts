@@ -9,6 +9,7 @@
 
 import { NextResponse } from "next/server";
 import { addMessage, getConversationWithMessages } from "@/lib/handoff/store";
+import { sendWhatsAppText, within24hWindow } from "@/lib/handoff/channels/whatsapp";
 
 export async function POST(
   req: Request,
@@ -35,6 +36,31 @@ export async function POST(
     if (!conversation) {
       return NextResponse.json({ error: "Conversación no encontrada" }, { status: 404 });
     }
+
+    // Si la conversación es de WhatsApp, entregar la respuesta del humano por
+    // ese canal (dentro de la ventana de 24h). En web, solo se guarda y el
+    // widget la recibe por polling.
+    if (conversation.channel === "whatsapp") {
+      if (!within24hWindow(conversation.lastCustomerMessageAt)) {
+        return NextResponse.json(
+          {
+            error:
+              "Fuera de la ventana de 24h de WhatsApp. Meta solo permite plantillas pre-aprobadas fuera de ese plazo (pendiente de implementar).",
+          },
+          { status: 409 },
+        );
+      }
+      try {
+        await sendWhatsAppText(conversation.externalId, text);
+      } catch (sendErr) {
+        console.error("[handoff/reply] envío WhatsApp falló:", sendErr);
+        return NextResponse.json(
+          { error: "No se pudo entregar el mensaje por WhatsApp" },
+          { status: 502 },
+        );
+      }
+    }
+
     const message = await addMessage(id, "HUMAN", text);
     return NextResponse.json({ message });
   } catch (err) {

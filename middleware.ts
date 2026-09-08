@@ -16,6 +16,7 @@ const PUBLIC_ROUTES = [
   // (widget web / webhook de canal). Los endpoints del PANEL
   // (/api/handoff/conversations*) NO se listan aquí → quedan protegidos por auth.
   "/api/handoff/message",
+  "/api/handoff/whatsapp", // webhook de Meta (verificación GET + mensajes POST)
   "/api/projects",
   "/api/usage",
   "/api/export-context",
