@@ -22,6 +22,7 @@ import {
   BookText,
   Repeat,
   History,
+  MessageSquare,
   type LucideIcon,
 } from "lucide-react";
 
@@ -46,6 +47,7 @@ const MAP: Record<string, LucideIcon> = {
   BookText,
   Repeat,
   History,
+  MessageSquare,
 };
 
 export function RoleIcon({
