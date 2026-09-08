@@ -27,6 +27,11 @@ model Project {
   // Single source of truth for which repo Core should target when emitting git_* actions.
   // Null = no repo associated (Core should ask the user which repo to use before git actions).
   repo        String?
+  // Handoff — panel del cliente (DEC-LOGAN-022, Fase 3.1).
+  // Contraseña simple por proyecto para que el DUEÑO del negocio entre a su
+  // panel acotado (/panel/[projectId]) y atienda SUS conversaciones. Null =
+  // el panel del cliente no está habilitado para este proyecto todavía.
+  clientPanelPassword String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

@@ -17,6 +17,11 @@ const PUBLIC_ROUTES = [
   // (/api/handoff/conversations*) NO se listan aquí → quedan protegidos por auth.
   "/api/handoff/message",
   "/api/handoff/whatsapp", // webhook de Meta (verificación GET + mensajes POST)
+  // Panel del cliente (DEC-LOGAN-022): login + endpoints del cliente. NO usan
+  // logan_auth de admin; se auto-protegen con la cookie client_auth_<projectId>.
+  "/api/handoff/client-login",
+  "/api/handoff/client",
+  "/panel", // la página del panel del cliente (se protege dentro con su login)
   "/api/projects",
   "/api/usage",
   "/api/export-context",
