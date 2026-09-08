@@ -615,6 +615,7 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
   { key: "finance", label: "Finance", icon: "Coins", group: "PROYECTO", requiresProject: true },
   { key: "legal", label: "Legal", icon: "Scale", group: "PROYECTO", requiresProject: true },
   { key: "support", label: "Support", icon: "LifeBuoy", group: "PROYECTO", requiresProject: true },
+  { key: "conversaciones", label: "Conversaciones", icon: "MessageSquare", group: "PROYECTO", requiresProject: true },
   { key: "admin", label: "Admin POS", icon: "Building2", group: "ADMIN", requiresProject: false },
 ];
 
