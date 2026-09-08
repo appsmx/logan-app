@@ -73,7 +73,15 @@ export async function POST(req: Request) {
           ? within24hWindow(conv.lastCustomerMessageAt)
           : true;
         if (withinWindow) {
-          await sendWhatsAppText(msg.from, result.reply);
+          const sent = await sendWhatsAppText(msg.from, result.reply);
+          if (!sent.ok) {
+            console.error(
+              `[whatsapp/webhook] El bot respondió pero WhatsApp NO entregó (${sent.status ?? "error"}): ${sent.error}. ` +
+                (sent.status === 401
+                  ? "El token expiró/inválido — regenera WHATSAPP_TOKEN en Meta."
+                  : ""),
+            );
+          }
         } else {
           console.warn(
             "[whatsapp/webhook] Fuera de la ventana de 24h; se requiere plantilla (pendiente).",

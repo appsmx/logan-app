@@ -50,28 +50,32 @@ export async function POST(
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
 
-  // Entregar por WhatsApp si aplica (dentro de la ventana de 24h).
+  // 1. Guardar SIEMPRE el mensaje del humano primero (no perder el texto aunque
+  //    el envío por WhatsApp falle por token/ventana de 24h).
+  const message = await addMessage(id, "HUMAN", clean);
+
+  // 2. Entregar por WhatsApp si aplica — "best effort" (no bloquea el guardado).
+  let delivery: { delivered: boolean; warning?: string } = { delivered: true };
   if (conversation.channel === "whatsapp") {
     if (!within24hWindow(conversation.lastCustomerMessageAt)) {
-      return NextResponse.json(
-        {
-          error:
-            "Fuera de la ventana de 24h de WhatsApp. Solo se permiten plantillas pre-aprobadas fuera de ese plazo (pendiente).",
-        },
-        { status: 409 },
-      );
-    }
-    try {
-      await sendWhatsAppText(conversation.externalId, clean);
-    } catch (sendErr) {
-      console.error("[client/reply] envío WhatsApp falló:", sendErr);
-      return NextResponse.json(
-        { error: "No se pudo entregar el mensaje por WhatsApp" },
-        { status: 502 },
-      );
+      delivery = {
+        delivered: false,
+        warning:
+          "Guardado, pero WhatsApp no lo entregó: pasaron más de 24h desde el último mensaje del cliente. Meta solo permite plantillas fuera de ese plazo.",
+      };
+    } else {
+      const res = await sendWhatsAppText(conversation.externalId, clean);
+      if (!res.ok) {
+        delivery = {
+          delivered: false,
+          warning:
+            res.status === 401
+              ? "Guardado, pero WhatsApp rechazó el envío: el token de acceso expiró o es inválido. Regenéralo en Meta y actualiza WHATSAPP_TOKEN."
+              : `Guardado, pero WhatsApp no lo entregó (${res.status ?? "error"}). ${res.error}`,
+        };
+      }
     }
   }
 
-  const message = await addMessage(id, "HUMAN", clean);
-  return NextResponse.json({ message });
+  return NextResponse.json({ message, ...delivery });
 }

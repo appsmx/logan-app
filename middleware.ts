@@ -160,7 +160,9 @@ export function middleware(request: NextRequest) {
     if (isAuthenticated(request)) {
       return NextResponse.next();
     }
-    return NextResponse.redirect(new URL("/showcase", request.url));
+    // Sin sesión → al login del admin (antes iba a /showcase, lo que creaba un
+    // bucle: el botón "App LOGAN OS" apunta a "/" y nunca se llegaba al login).
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   if (isPublicRoute(pathname)) {
@@ -171,7 +173,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  return NextResponse.redirect(new URL("/showcase", request.url));
+  // Rutas protegidas del admin sin sesión → al login (no al showcase).
+  return NextResponse.redirect(new URL("/login", request.url));
 }
 
 export const config = {

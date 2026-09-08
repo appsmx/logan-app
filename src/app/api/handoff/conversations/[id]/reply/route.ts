@@ -37,32 +37,33 @@ export async function POST(
       return NextResponse.json({ error: "Conversación no encontrada" }, { status: 404 });
     }
 
-    // Si la conversación es de WhatsApp, entregar la respuesta del humano por
-    // ese canal (dentro de la ventana de 24h). En web, solo se guarda y el
-    // widget la recibe por polling.
+    // 1. Guardar SIEMPRE primero (no perder el texto si el envío falla).
+    const message = await addMessage(id, "HUMAN", text);
+
+    // 2. Entregar por WhatsApp si aplica — best effort.
+    let delivery: { delivered: boolean; warning?: string } = { delivered: true };
     if (conversation.channel === "whatsapp") {
       if (!within24hWindow(conversation.lastCustomerMessageAt)) {
-        return NextResponse.json(
-          {
-            error:
-              "Fuera de la ventana de 24h de WhatsApp. Meta solo permite plantillas pre-aprobadas fuera de ese plazo (pendiente de implementar).",
-          },
-          { status: 409 },
-        );
-      }
-      try {
-        await sendWhatsAppText(conversation.externalId, text);
-      } catch (sendErr) {
-        console.error("[handoff/reply] envío WhatsApp falló:", sendErr);
-        return NextResponse.json(
-          { error: "No se pudo entregar el mensaje por WhatsApp" },
-          { status: 502 },
-        );
+        delivery = {
+          delivered: false,
+          warning:
+            "Guardado, pero WhatsApp no lo entregó: pasaron más de 24h desde el último mensaje del cliente.",
+        };
+      } else {
+        const res = await sendWhatsAppText(conversation.externalId, text);
+        if (!res.ok) {
+          delivery = {
+            delivered: false,
+            warning:
+              res.status === 401
+                ? "Guardado, pero el token de WhatsApp expiró/inválido. Regenéralo en Meta y actualiza WHATSAPP_TOKEN."
+                : `Guardado, pero WhatsApp no lo entregó (${res.status ?? "error"}).`,
+          };
+        }
       }
     }
 
-    const message = await addMessage(id, "HUMAN", text);
-    return NextResponse.json({ message });
+    return NextResponse.json({ message, ...delivery });
   } catch (err) {
     console.error("[handoff/reply] error:", err);
     return NextResponse.json({ error: "No se pudo enviar la respuesta" }, { status: 500 });
