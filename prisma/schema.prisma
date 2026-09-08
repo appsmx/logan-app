@@ -336,3 +336,58 @@ model LlmUsage {
   @@index([createdAt])
   @@index([provider])
 }
+
+
+// ─── Módulo de Handoff Humano (DEC-LOGAN-021) ───────────────────────────────
+// Permite que el negocio apague el agente de IA y tome control manual de una
+// conversación con su cliente, en cualquier canal (web, WhatsApp, IG/Messenger).
+//
+// NOTA: a diferencia del Asistente IA (DEC-LOGAN-011, stateless/in-memory), el
+// handoff SÍ persiste — necesita que el estado bot/humano y el historial
+// sobrevivan entre requests y sean legibles desde el panel del negocio.
+
+model Conversation {
+  id            String     @id @default(cuid())
+  // Multi-tenant: a qué proyecto/cliente pertenece la conversación.
+  projectId     String
+  channel       String     @default("web") // web | whatsapp | instagram | messenger
+  externalId    String                     // id del cliente en ese canal (ej. número E.164 en WhatsApp, o sessionId en web)
+  mode          ConvMode   @default(BOT)    // EL INTERRUPTOR: BOT = responde IA, HUMAN = responde una persona
+  status        ConvStatus @default(OPEN)
+  // Timestamp del último mensaje del CLIENTE — clave para la ventana de 24h de WhatsApp.
+  lastCustomerMessageAt DateTime @default(now())
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  messages      Message[]
+
+  @@unique([projectId, channel, externalId])
+  @@index([projectId, status])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         Sender       // quién envió el mensaje
+  content        String
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+enum ConvMode {
+  BOT
+  HUMAN
+}
+
+enum ConvStatus {
+  OPEN
+  CLOSED
+  WAITING_HUMAN
+}
+
+enum Sender {
+  CUSTOMER
+  BOT
+  HUMAN
+}
