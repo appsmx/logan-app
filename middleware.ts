@@ -29,6 +29,10 @@ const PUBLIC_ROUTES = [
   "/_next",
   "/favicon",
   "/logo",
+  // PWA (DEC-LOGAN-022, Fase 3.4): manifest y service worker deben ser públicos
+  // para que el navegador pueda instalar la app.
+  "/manifest.webmanifest",
+  "/sw.js",
 ];
 
 // Dominios permitidos para CORS
