@@ -75,9 +75,50 @@ function getCorsHeaders(origin: string | null) {
   return headers;
 }
 
+// Subdominios reservados que NO son paneles de cliente.
+const RESERVED_SUBDOMAINS = new Set(["www", "loganos", "app", "api", ""]);
+
+/**
+ * Detecta el panel de cliente por subdominio (DEC-LOGAN-022, Fase 3.5).
+ * Si el host es {slug}.loganos.com (y no un subdominio reservado), devuelve el
+ * slug; si no, null.
+ */
+function getClientSlug(host: string | null): string | null {
+  if (!host) return null;
+  const hostname = host.split(":")[0]; // quita el puerto
+  // Solo aplica a *.loganos.com
+  if (!hostname.endsWith(".loganos.com")) return null;
+  const sub = hostname.slice(0, -".loganos.com".length);
+  if (!sub || sub.includes(".")) return null; // solo un nivel de subdominio
+  if (RESERVED_SUBDOMAINS.has(sub)) return null;
+  return sub;
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const origin = request.headers.get("origin");
+  const host = request.headers.get("host");
+
+  // --- Routing por subdominio del panel del cliente (Fase 3.5) ---
+  // {slug}.loganos.com → reescribe internamente a /panel/by-slug/{slug}
+  // (la URL en el navegador se mantiene bonita; el resolver hace slug→projectId).
+  const clientSlug = getClientSlug(host);
+  if (clientSlug) {
+    // Las llamadas a la API deben seguir funcionando normal desde el subdominio;
+    // solo reescribimos las rutas de página (no /api, /_next, assets).
+    if (
+      !pathname.startsWith("/api/") &&
+      !pathname.startsWith("/_next") &&
+      !pathname.startsWith("/panel/") &&
+      pathname !== "/sw.js" &&
+      pathname !== "/manifest.webmanifest" &&
+      !pathname.startsWith("/logo")
+    ) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/panel/by-slug/${clientSlug}`;
+      return NextResponse.rewrite(url);
+    }
+  }
 
   // --- ALL /api/ routes get CORS headers ---
   if (pathname.startsWith("/api/")) {

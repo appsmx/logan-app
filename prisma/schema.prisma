@@ -32,6 +32,10 @@ model Project {
   // panel acotado (/panel/[projectId]) y atienda SUS conversaciones. Null =
   // el panel del cliente no está habilitado para este proyecto todavía.
   clientPanelPassword String?
+  // Slug para el subdominio del panel (DEC-LOGAN-022, Fase 3.5).
+  // Ej. slug="mariscosquiroa" → mariscosquiroa.loganos.com. Único. Null = sin
+  // subdominio (se accede por /panel/[id]).
+  slug        String?  @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
