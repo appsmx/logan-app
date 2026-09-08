@@ -14,6 +14,7 @@ import { use } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { Bot, User, Send, MessageSquare, LogOut, Clock } from "lucide-react";
+import { ServiceWorkerRegister } from "./sw-register";
 
 type Conversation = {
   id: string;
@@ -48,15 +49,21 @@ export default function ClientPanelPage({
   if (authed === null) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[oklch(0.12_0.008_60)] text-[oklch(0.85_0.012_75)]">
+        <ServiceWorkerRegister />
         Cargando…
       </div>
     );
   }
 
-  return authed ? (
-    <PanelInner projectId={projectId} onLogout={() => setAuthed(false)} />
-  ) : (
-    <LoginForm projectId={projectId} onSuccess={() => setAuthed(true)} />
+  return (
+    <>
+      <ServiceWorkerRegister />
+      {authed ? (
+        <PanelInner projectId={projectId} onLogout={() => setAuthed(false)} />
+      ) : (
+        <LoginForm projectId={projectId} onSuccess={() => setAuthed(true)} />
+      )}
+    </>
   );
 }
 
