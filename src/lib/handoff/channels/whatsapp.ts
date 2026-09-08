@@ -26,38 +26,56 @@ export function within24hWindow(lastCustomerMessageAt: Date, now = new Date()): 
   return diffMs <= 24 * 60 * 60 * 1000;
 }
 
+export type SendResult =
+  | { ok: true }
+  | { ok: false; error: string; status?: number };
+
 /**
  * Envía un mensaje de texto libre por WhatsApp Cloud API.
  * Úsalo SOLO dentro de la ventana de 24h (fuera de ella Meta rechaza con 131047
  * y hay que usar una plantilla pre-aprobada — pendiente para más adelante).
+ *
+ * Devuelve un resultado (no lanza) para que el caller decida: normalmente el
+ * mensaje ya se guardó y el envío es "best effort" (no debe perderse el texto
+ * del humano si Meta rechaza por token expirado o ventana de 24h).
  */
-export async function sendWhatsAppText(to: string, text: string): Promise<void> {
+export async function sendWhatsAppText(to: string, text: string): Promise<SendResult> {
   const token = process.env.WHATSAPP_TOKEN;
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   if (!token || !phoneNumberId) {
-    throw new Error(
-      "WhatsApp no configurado: faltan WHATSAPP_TOKEN / WHATSAPP_PHONE_NUMBER_ID",
-    );
+    return {
+      ok: false,
+      error: "WhatsApp no configurado: faltan WHATSAPP_TOKEN / WHATSAPP_PHONE_NUMBER_ID",
+    };
   }
 
-  const res = await fetch(graphUrl(phoneNumberId), {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      messaging_product: "whatsapp",
-      recipient_type: "individual",
-      to,
-      type: "text",
-      text: { body: text },
-    }),
-  });
+  try {
+    const res = await fetch(graphUrl(phoneNumberId), {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to,
+        type: "text",
+        text: { body: text },
+      }),
+    });
 
-  if (!res.ok) {
-    const errBody = await res.text().catch(() => "");
-    throw new Error(`WhatsApp send falló (${res.status}): ${errBody}`);
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => "");
+      // Log detallado para diagnóstico (token expirado = 401; fuera de 24h = 131047).
+      console.error(`[whatsapp] send falló (${res.status}): ${errBody.slice(0, 400)}`);
+      return { ok: false, error: errBody.slice(0, 300), status: res.status };
+    }
+    return { ok: true };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[whatsapp] send excepción:", msg);
+    return { ok: false, error: msg };
   }
 }
 

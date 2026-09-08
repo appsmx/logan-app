@@ -262,12 +262,19 @@ function ClientConversation({
     if (!t) return;
     setBusy(true);
     try {
-      await api(`/api/handoff/client/conversations/${conversationId}/reply`, {
-        method: "POST",
-        body: JSON.stringify({ projectId, text: t }),
-      });
+      const res = await api<{ delivered?: boolean; warning?: string }>(
+        `/api/handoff/client/conversations/${conversationId}/reply`,
+        {
+          method: "POST",
+          body: JSON.stringify({ projectId, text: t }),
+        },
+      );
       setText("");
       load();
+      // El mensaje se guarda siempre; si WhatsApp no lo entregó, avisamos.
+      if (res && res.delivered === false && res.warning) {
+        toast.warning(res.warning);
+      }
     } catch (e) {
       toast.error(`No se pudo enviar: ${(e as Error).message}`);
     } finally {
