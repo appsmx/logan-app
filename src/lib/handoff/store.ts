@@ -88,3 +88,19 @@ export async function getConversationWithMessages(conversationId: string) {
     include: { messages: { orderBy: { createdAt: "asc" } } },
   });
 }
+
+/**
+ * Verifica que una conversación pertenece a un proyecto dado.
+ * Usado por los endpoints del cliente para aislamiento (un cliente solo puede
+ * operar conversaciones de SU proyecto).
+ */
+export async function conversationBelongsToProject(
+  conversationId: string,
+  projectId: string,
+): Promise<boolean> {
+  const conv = await db.conversation.findUnique({
+    where: { id: conversationId },
+    select: { projectId: true },
+  });
+  return conv?.projectId === projectId;
+}
