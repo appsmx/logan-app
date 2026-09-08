@@ -12,6 +12,10 @@ const PUBLIC_ROUTES = [
   "/api/login",
   "/api/showcase",
   "/api/assistant",
+  // Handoff (DEC-LOGAN-021): la ENTRADA de mensajes del cliente es pública
+  // (widget web / webhook de canal). Los endpoints del PANEL
+  // (/api/handoff/conversations*) NO se listan aquí → quedan protegidos por auth.
+  "/api/handoff/message",
   "/api/projects",
   "/api/usage",
   "/api/export-context",
