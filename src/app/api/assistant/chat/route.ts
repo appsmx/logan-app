@@ -43,6 +43,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { callLLM } from "@/lib/llm/client";
+import { recordLlmUsage } from "@/lib/llm/record-usage";
 
 import { db } from "@/lib/db";
 import { buildAssistantSystemPrompt, RATE_LIMIT_RESPONSE } from "@/lib/assistant/system-prompt";
@@ -166,6 +167,10 @@ export async function POST(req: NextRequest) {
     const currentMessage = messages[messages.length - 1]?.content || userMessage;
     const llmResponse = await callLLM({ task: "assistant", systemPrompt: sysPrompt, userMessage: currentMessage, history });
     responseText = llmResponse.text.trim();
+    // Registrar el gasto de IA por proyecto (antes NO se registraba en este
+    // endpoint → el consumo de proyectos como Mr. Trámite no aparecía en el
+    // reporte). Usa el slug del repo si existe, si no el nombre.
+    recordLlmUsage(project.repo || project.name, "assistant", llmResponse);
     if (!responseText) {
       console.error("[assistant/chat] LLM devolvió respuesta vacía");
       return unavailable();
