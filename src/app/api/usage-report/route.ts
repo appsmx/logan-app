@@ -5,7 +5,8 @@
 // por el middleware (auth logan_auth), así que no expone el secret al navegador.
 //
 // Query (opcionales): ?from=ISO&to=ISO  (default: mes actual)
-// Devuelve: { from, to, totals, byProject, byProvider }
+// Devuelve: { from, to, totals, byProject, byTenant, byClient, byChannel,
+//            byClientChannel, byProvider }
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
@@ -20,58 +21,81 @@ export async function GET(req: NextRequest) {
 
     const rows = await db.llmUsage.findMany({
       where: { createdAt: { gte: from, lte: to } },
-      select: { project: true, tenant: true, provider: true, totalTokens: true, costUsd: true },
+      select: {
+        project: true,
+        tenant: true,
+        client: true,
+        channel: true,
+        provider: true,
+        totalTokens: true,
+        costUsd: true,
+      },
     });
 
-    const byProjectMap = new Map<string, { calls: number; totalTokens: number; costUsd: number }>();
-    const byProviderMap = new Map<string, { calls: number; totalTokens: number; costUsd: number }>();
-    const byTenantMap = new Map<string, { calls: number; totalTokens: number; costUsd: number }>();
+    type Bucket = { calls: number; totalTokens: number; costUsd: number };
+    const mkMap = () => new Map<string, Bucket>();
+    const byProjectMap = mkMap();
+    const byProviderMap = mkMap();
+    const byTenantMap = mkMap();
+    const byClientMap = mkMap();
+    const byChannelMap = mkMap();
+    // Desglose por canal DENTRO de cada cliente: clientSlug -> (channel -> Bucket)
+    const clientChannelMap = new Map<string, Map<string, Bucket>>();
     let totalCalls = 0;
     let totalTokens = 0;
     let totalCost = 0;
+
+    const bump = (map: Map<string, Bucket>, key: string, r: { totalTokens: number; costUsd: number }) => {
+      const b = map.get(key) || { calls: 0, totalTokens: 0, costUsd: 0 };
+      b.calls += 1;
+      b.totalTokens += r.totalTokens;
+      b.costUsd += r.costUsd;
+      map.set(key, b);
+    };
 
     for (const r of rows) {
       totalCalls += 1;
       totalTokens += r.totalTokens;
       totalCost += r.costUsd;
 
-      const p = byProjectMap.get(r.project) || { calls: 0, totalTokens: 0, costUsd: 0 };
-      p.calls += 1;
-      p.totalTokens += r.totalTokens;
-      p.costUsd += r.costUsd;
-      byProjectMap.set(r.project, p);
+      bump(byProjectMap, r.project, r);
+      bump(byProviderMap, r.provider, r);
+      bump(byTenantMap, r.tenant && r.tenant.trim() ? r.tenant.trim() : "Sin identificar", r);
 
-      const v = byProviderMap.get(r.provider) || { calls: 0, totalTokens: 0, costUsd: 0 };
-      v.calls += 1;
-      v.totalTokens += r.totalTokens;
-      v.costUsd += r.costUsd;
-      byProviderMap.set(r.provider, v);
+      const clientKey = r.client && r.client.trim() ? r.client.trim() : "Sin identificar";
+      const channelKey = r.channel && r.channel.trim() ? r.channel.trim() : "Sin identificar";
+      bump(byClientMap, clientKey, r);
+      bump(byChannelMap, channelKey, r);
 
-      // Desglose por cliente/negocio. Las llamadas sin tenant (registros
-      // anteriores o servicios que no lo envían) se agrupan como "Sin identificar".
-      const tenantKey = r.tenant && r.tenant.trim() ? r.tenant.trim() : "Sin identificar";
-      const t = byTenantMap.get(tenantKey) || { calls: 0, totalTokens: 0, costUsd: 0 };
-      t.calls += 1;
-      t.totalTokens += r.totalTokens;
-      t.costUsd += r.costUsd;
-      byTenantMap.set(tenantKey, t);
+      // Canal dentro del cliente (para mostrarle a cada cliente en qué gasta más).
+      let inner = clientChannelMap.get(clientKey);
+      if (!inner) {
+        inner = mkMap();
+        clientChannelMap.set(clientKey, inner);
+      }
+      bump(inner, channelKey, r);
     }
 
     const round = (n: number) => Math.round(n * 1_000_000) / 1_000_000;
+    const serialize = <K extends string>(map: Map<string, Bucket>, keyName: K) =>
+      [...map.entries()]
+        .map(([k, s]) => ({ [keyName]: k, ...s, costUsd: round(s.costUsd) }))
+        .sort((a, b) => b.costUsd - a.costUsd);
 
     return NextResponse.json({
       from: from.toISOString(),
       to: to.toISOString(),
       totals: { calls: totalCalls, totalTokens, costUsd: round(totalCost) },
-      byProject: [...byProjectMap.entries()]
-        .map(([project, s]) => ({ project, ...s, costUsd: round(s.costUsd) }))
-        .sort((a, b) => b.costUsd - a.costUsd),
-      byTenant: [...byTenantMap.entries()]
-        .map(([tenant, s]) => ({ tenant, ...s, costUsd: round(s.costUsd) }))
-        .sort((a, b) => b.costUsd - a.costUsd),
-      byProvider: [...byProviderMap.entries()]
-        .map(([provider, s]) => ({ provider, ...s, costUsd: round(s.costUsd) }))
-        .sort((a, b) => b.costUsd - a.costUsd),
+      byProject: serialize(byProjectMap, "project"),
+      byTenant: serialize(byTenantMap, "tenant"),
+      byClient: serialize(byClientMap, "client"),
+      byChannel: serialize(byChannelMap, "channel"),
+      // Por cada cliente, su desglose de canales (en qué apartado gasta más).
+      byClientChannel: [...clientChannelMap.entries()].map(([client, inner]) => ({
+        client,
+        channels: serialize(inner, "channel"),
+      })),
+      byProvider: serialize(byProviderMap, "provider"),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";

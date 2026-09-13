@@ -338,6 +338,8 @@ model LlmUsage {
   id               String   @id @default(cuid())
   project          String   @default("desconocido") // slug del producto que llamó
   tenant           String?                           // nombre del negocio/cliente dentro del producto (ej. "Mariscos Quiroa")
+  client           String?                           // slug del cliente/dueño para AGRUPAR su gasto entre productos (ej. "mariscosquiroa")
+  channel          String?                           // canal/apartado donde se usó la IA (pdv | web | whatsapp | instagram | messenger)
   task             String   @default("assistant")   // tarea LLM (assistant, support, etc.)
   provider         String                            // gemini | groq | deepseek | openai | ...
   model            String
@@ -349,6 +351,7 @@ model LlmUsage {
 
   @@index([project])
   @@index([tenant])
+  @@index([client])
   @@index([createdAt])
   @@index([provider])
 }

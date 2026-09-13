@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/card";
 import { SectionHeading } from "@/components/logan/SectionHeading";
 import { EmptyState } from "@/components/logan/EmptyState";
-import { Building2, Coins, Cpu, TrendingUp } from "lucide-react";
+import { Building2, ChevronDown, Coins, Cpu, Radio, TrendingUp } from "lucide-react";
 
 type Bucket = { calls: number; totalTokens: number; costUsd: number };
 type UsageReport = {
@@ -25,8 +25,24 @@ type UsageReport = {
   totals: Bucket;
   byProject: (Bucket & { project: string })[];
   byTenant: (Bucket & { tenant: string })[];
+  byClient: (Bucket & { client: string })[];
+  byChannel: (Bucket & { channel: string })[];
+  byClientChannel: { client: string; channels: (Bucket & { channel: string })[] }[];
   byProvider: (Bucket & { provider: string })[];
 };
+
+// Etiqueta legible para cada canal técnico.
+const CHANNEL_LABELS: Record<string, string> = {
+  pdv: "🖥️ Punto de venta (PDV)",
+  web: "🌐 Sitio web",
+  whatsapp: "📱 WhatsApp",
+  instagram: "📸 Instagram",
+  messenger: "💬 Messenger",
+  "Sin identificar": "Sin identificar",
+};
+function channelLabel(c: string) {
+  return CHANNEL_LABELS[c] ?? c;
+}
 
 function money(n: number) {
   return `$${n.toFixed(n < 0.01 ? 6 : 4)} USD`;
@@ -122,7 +138,7 @@ export function UsageSection() {
             </CardContent>
           </Card>
 
-          {/* Gasto por cliente/negocio */}
+          {/* Gasto por cliente/negocio (agrupado por slug) con desglose de canal */}
           <Card className="border-t-2 border-t-primary/40">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-serif text-lg">
@@ -130,24 +146,55 @@ export function UsageSection() {
                 Por cliente
               </CardTitle>
               <CardDescription>
-                Gasto de IA por negocio dentro de cada producto (ej. cada restaurante del POS). La base para cobrarle a cada cliente.
+                Gasto total de IA por cliente (suma todos sus canales: PDV, web, WhatsApp…). La base para cobrarle a cada uno. Toca un cliente para ver en qué canal gasta más.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {data.byTenant.length === 0 ? (
+              {data.byClient.length === 0 ? (
                 <EmptyState
                   icon={<Building2 className="size-5" />}
                   title="Sin consumo por cliente este mes"
                   description="Cuando los negocios usen IA, verás aquí cuánto gasta cada uno."
                 />
               ) : (
+                <div className="space-y-2">
+                  {data.byClient.map((c) => (
+                    <ClientRow
+                      key={c.client}
+                      client={c.client}
+                      cost={c.costUsd}
+                      calls={c.calls}
+                      max={Math.max(...data.byClient.map((x) => x.costUsd), 0.000001)}
+                      channels={
+                        data.byClientChannel.find((cc) => cc.client === c.client)?.channels ?? []
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Gasto por canal (global, todos los clientes) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 font-serif text-lg">
+                <Radio className="size-5 text-muted-foreground" />
+                Por canal
+              </CardTitle>
+              <CardDescription>Dónde se usa más la IA en todo el ecosistema (PDV, web, WhatsApp…).</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {data.byChannel.length === 0 ? (
+                <p className="py-6 text-center text-sm text-muted-foreground">Sin datos.</p>
+              ) : (
                 <BreakdownBars
-                  rows={data.byTenant.map((t) => ({
-                    label: t.tenant,
-                    calls: t.calls,
-                    cost: t.costUsd,
+                  rows={data.byChannel.map((c) => ({
+                    label: channelLabel(c.channel),
+                    calls: c.calls,
+                    cost: c.costUsd,
                   }))}
-                  max={Math.max(...data.byTenant.map((t) => t.costUsd), 0.000001)}
+                  max={Math.max(...data.byChannel.map((c) => c.costUsd), 0.000001)}
                 />
               )}
             </CardContent>
@@ -235,6 +282,75 @@ function BreakdownBars({
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+/**
+ * Fila de un cliente en el desglose "Por cliente". Muestra su gasto total y,
+ * al expandirse, en qué canal (PDV, web, WhatsApp…) gastó más — útil para
+ * mostrarle al propio cliente el detalle de su consumo.
+ */
+function ClientRow({
+  client,
+  cost,
+  calls,
+  max,
+  channels,
+}: {
+  client: string;
+  cost: number;
+  calls: number;
+  max: number;
+  channels: { channel: string; calls: number; costUsd: number }[];
+}) {
+  const [open, setOpen] = React.useState(false);
+  const hasDetail = channels.length > 0;
+
+  return (
+    <div className="rounded-lg border border-border/60 bg-card/40">
+      <button
+        type="button"
+        onClick={() => hasDetail && setOpen((v) => !v)}
+        className="w-full px-3 py-2.5 text-left"
+        aria-expanded={open}
+      >
+        <div className="mb-1 flex items-center justify-between text-sm">
+          <span className="flex items-center gap-1.5 font-medium text-foreground/90">
+            {hasDetail && (
+              <ChevronDown
+                className={`size-4 text-muted-foreground transition-transform ${open ? "" : "-rotate-90"}`}
+              />
+            )}
+            {client}
+          </span>
+          <span className="text-muted-foreground">
+            {money(cost)} · {calls} llamadas
+          </span>
+        </div>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-[oklch(0.62_0.13_260)] to-[oklch(0.55_0.15_300)]"
+            style={{ width: `${Math.max(2, (cost / max) * 100)}%` }}
+          />
+        </div>
+      </button>
+
+      {open && hasDetail && (
+        <div className="border-t border-border/60 px-3 py-3 pl-9">
+          <p className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">
+            Gasto por canal
+          </p>
+          <BreakdownBars
+            rows={channels.map((ch) => ({
+              label: channelLabel(ch.channel),
+              calls: ch.calls,
+              cost: ch.costUsd,
+            }))}
+            max={Math.max(...channels.map((ch) => ch.costUsd), 0.000001)}
+          />
+        </div>
+      )}
     </div>
   );
 }
