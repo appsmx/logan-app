@@ -21,6 +21,8 @@ import { estimateCostUsd } from "@/lib/llm/usage-cost";
  *   temperature?: number
  *   project?: string          // slug del producto que llama (ej. "restaurant-pos")
  *   tenant?: string           // nombre del negocio/cliente dentro del producto (ej. "Mariscos Quiroa")
+ *   client?: string           // slug del dueño para agrupar su gasto entre productos (ej. "mariscosquiroa")
+ *   channel?: string          // canal donde se usó la IA (pdv | web | whatsapp | instagram | messenger)
  *   tools?: LLMTool[]          // opcional: function calling. Si se omite, solo texto.
  *   toolChoice?: "auto"|"none"|{ type:"function", function:{ name } }
  * }
@@ -57,7 +59,7 @@ export async function POST(req: NextRequest) {
     // If no secret is configured (dev mode), allow all requests
 
     const body = await req.json();
-    const { task, systemPrompt, userMessage, history, maxTokens, temperature, project, tenant, tools, toolChoice } = body;
+    const { task, systemPrompt, userMessage, history, maxTokens, temperature, project, tenant, client, channel, tools, toolChoice } = body;
 
     // Validate required fields
     if (!systemPrompt || !userMessage) {
@@ -95,6 +97,8 @@ export async function POST(req: NextRequest) {
         data: {
           project: typeof project === "string" && project.trim() ? project.trim() : "desconocido",
           tenant: typeof tenant === "string" && tenant.trim() ? tenant.trim() : null,
+          client: typeof client === "string" && client.trim() ? client.trim() : null,
+          channel: typeof channel === "string" && channel.trim() ? channel.trim() : null,
           task: effectiveTask,
           provider: result.provider,
           model: result.model,
