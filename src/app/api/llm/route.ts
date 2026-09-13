@@ -19,6 +19,8 @@ import { estimateCostUsd } from "@/lib/llm/usage-cost";
  *   history?: { role: "user"|"assistant"|"system"|"tool", content: string, ... }[]
  *   maxTokens?: number
  *   temperature?: number
+ *   project?: string          // slug del producto que llama (ej. "restaurant-pos")
+ *   tenant?: string           // nombre del negocio/cliente dentro del producto (ej. "Mariscos Quiroa")
  *   tools?: LLMTool[]          // opcional: function calling. Si se omite, solo texto.
  *   toolChoice?: "auto"|"none"|{ type:"function", function:{ name } }
  * }
@@ -55,7 +57,7 @@ export async function POST(req: NextRequest) {
     // If no secret is configured (dev mode), allow all requests
 
     const body = await req.json();
-    const { task, systemPrompt, userMessage, history, maxTokens, temperature, project, tools, toolChoice } = body;
+    const { task, systemPrompt, userMessage, history, maxTokens, temperature, project, tenant, tools, toolChoice } = body;
 
     // Validate required fields
     if (!systemPrompt || !userMessage) {
@@ -92,6 +94,7 @@ export async function POST(req: NextRequest) {
       .create({
         data: {
           project: typeof project === "string" && project.trim() ? project.trim() : "desconocido",
+          tenant: typeof tenant === "string" && tenant.trim() ? tenant.trim() : null,
           task: effectiveTask,
           provider: result.provider,
           model: result.model,

@@ -337,6 +337,7 @@ model SupportAsset {
 model LlmUsage {
   id               String   @id @default(cuid())
   project          String   @default("desconocido") // slug del producto que llamó
+  tenant           String?                           // nombre del negocio/cliente dentro del producto (ej. "Mariscos Quiroa")
   task             String   @default("assistant")   // tarea LLM (assistant, support, etc.)
   provider         String                            // gemini | groq | deepseek | openai | ...
   model            String
@@ -347,6 +348,7 @@ model LlmUsage {
   createdAt        DateTime @default(now())
 
   @@index([project])
+  @@index([tenant])
   @@index([createdAt])
   @@index([provider])
 }
