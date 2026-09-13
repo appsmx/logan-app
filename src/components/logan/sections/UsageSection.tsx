@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/card";
 import { SectionHeading } from "@/components/logan/SectionHeading";
 import { EmptyState } from "@/components/logan/EmptyState";
-import { Coins, Cpu, TrendingUp } from "lucide-react";
+import { Building2, Coins, Cpu, TrendingUp } from "lucide-react";
 
 type Bucket = { calls: number; totalTokens: number; costUsd: number };
 type UsageReport = {
@@ -24,6 +24,7 @@ type UsageReport = {
   to: string;
   totals: Bucket;
   byProject: (Bucket & { project: string })[];
+  byTenant: (Bucket & { tenant: string })[];
   byProvider: (Bucket & { provider: string })[];
 };
 
@@ -116,6 +117,37 @@ export function UsageSection() {
                     cost: p.costUsd,
                   }))}
                   max={Math.max(...data.byProject.map((p) => p.costUsd), 0.000001)}
+                />
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Gasto por cliente/negocio */}
+          <Card className="border-t-2 border-t-primary/40">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 font-serif text-lg">
+                <Building2 className="size-5 text-primary" />
+                Por cliente
+              </CardTitle>
+              <CardDescription>
+                Gasto de IA por negocio dentro de cada producto (ej. cada restaurante del POS). La base para cobrarle a cada cliente.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {data.byTenant.length === 0 ? (
+                <EmptyState
+                  icon={<Building2 className="size-5" />}
+                  title="Sin consumo por cliente este mes"
+                  description="Cuando los negocios usen IA, verás aquí cuánto gasta cada uno."
+                />
+              ) : (
+                <BreakdownBars
+                  rows={data.byTenant.map((t) => ({
+                    label: t.tenant,
+                    calls: t.calls,
+                    cost: t.costUsd,
+                  }))}
+                  max={Math.max(...data.byTenant.map((t) => t.costUsd), 0.000001)}
                 />
               )}
             </CardContent>

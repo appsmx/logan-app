@@ -20,11 +20,12 @@ export async function GET(req: NextRequest) {
 
     const rows = await db.llmUsage.findMany({
       where: { createdAt: { gte: from, lte: to } },
-      select: { project: true, provider: true, totalTokens: true, costUsd: true },
+      select: { project: true, tenant: true, provider: true, totalTokens: true, costUsd: true },
     });
 
     const byProjectMap = new Map<string, { calls: number; totalTokens: number; costUsd: number }>();
     const byProviderMap = new Map<string, { calls: number; totalTokens: number; costUsd: number }>();
+    const byTenantMap = new Map<string, { calls: number; totalTokens: number; costUsd: number }>();
     let totalCalls = 0;
     let totalTokens = 0;
     let totalCost = 0;
@@ -45,6 +46,15 @@ export async function GET(req: NextRequest) {
       v.totalTokens += r.totalTokens;
       v.costUsd += r.costUsd;
       byProviderMap.set(r.provider, v);
+
+      // Desglose por cliente/negocio. Las llamadas sin tenant (registros
+      // anteriores o servicios que no lo envían) se agrupan como "Sin identificar".
+      const tenantKey = r.tenant && r.tenant.trim() ? r.tenant.trim() : "Sin identificar";
+      const t = byTenantMap.get(tenantKey) || { calls: 0, totalTokens: 0, costUsd: 0 };
+      t.calls += 1;
+      t.totalTokens += r.totalTokens;
+      t.costUsd += r.costUsd;
+      byTenantMap.set(tenantKey, t);
     }
 
     const round = (n: number) => Math.round(n * 1_000_000) / 1_000_000;
@@ -55,6 +65,9 @@ export async function GET(req: NextRequest) {
       totals: { calls: totalCalls, totalTokens, costUsd: round(totalCost) },
       byProject: [...byProjectMap.entries()]
         .map(([project, s]) => ({ project, ...s, costUsd: round(s.costUsd) }))
+        .sort((a, b) => b.costUsd - a.costUsd),
+      byTenant: [...byTenantMap.entries()]
+        .map(([tenant, s]) => ({ tenant, ...s, costUsd: round(s.costUsd) }))
         .sort((a, b) => b.costUsd - a.costUsd),
       byProvider: [...byProviderMap.entries()]
         .map(([provider, s]) => ({ provider, ...s, costUsd: round(s.costUsd) }))
